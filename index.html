@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>[hidden]{display:none!important}body{margin:0}html{color-scheme:light}</style></head><body>
-<title>Public Transport</title>
+<title>Next Route</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -792,7 +792,7 @@ button{cursor:pointer}
 .err{padding:12px 14px;color:var(--warn-ink);background:var(--warn-bg);border-radius:10px}
 
 /* map overlays */
-.chips{position:absolute;z-index:5;top:10px;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chips{position:absolute;z-index:5;top:62px;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
 .lchip{flex:none;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px;font-size:12px;box-shadow:var(--shadow)}
 .lchip[aria-pressed="false"]{opacity:.5}
@@ -817,7 +817,7 @@ button{cursor:pointer}
 .xfer dd{margin:0;min-width:0}
 .btnrow{display:flex;gap:8px;flex-wrap:wrap}
 .lnk{text-decoration:none;display:inline-flex;align-items:center;color:var(--ink);font-size:13px;padding:5px 10px;min-height:32px;width:fit-content}
-.stylesel{position:absolute;z-index:5;top:52px;right:max(16px,env(safe-area-inset-right,0px));border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:5px 8px;font-size:12px;box-shadow:var(--shadow);max-width:60%}
+.stylesel{position:absolute;z-index:5;top:108px;right:max(16px,env(safe-area-inset-right,0px));border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:5px 8px;font-size:12px;box-shadow:var(--shadow);max-width:60%}
 .attr{position:absolute;z-index:4;right:0;bottom:0;background:color-mix(in srgb,var(--surface) 80%,transparent);color:var(--ink-2);font-size:10px;padding:1px 6px;pointer-events:none}
 .zoom #names[aria-pressed="false"]{opacity:.5;text-decoration:line-through}
 
@@ -862,14 +862,47 @@ button{cursor:pointer}
 .simpin span{display:block;width:22px;height:22px;border-radius:50%;background:var(--accent);border:3px solid #fff;box-shadow:0 0 0 3px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.5);animation:simp 1.2s ease-in-out infinite}
 @keyframes simp{50%{transform:scale(1.2)}}
 @media (prefers-reduced-motion:reduce){.simpin span{animation:none}}
-@media (max-width:899px){.sim{left:8px;right:8px;width:auto;bottom:8px;max-height:calc(100% - 150px)}.zoom{bottom:auto;top:96px}.xflow b{font-size:14px}}
+@media (max-width:899px){.sim{left:8px;right:8px;width:auto;bottom:8px;max-height:calc(100% - 150px)}.zoom{bottom:auto;top:132px}.xflow b{font-size:14px}}
+
+/* search island, pin, popup */
+.island{position:absolute;z-index:7;top:10px;left:50%;transform:translateX(-50%);width:min(560px,calc(100% - 32px));display:flex;align-items:center;gap:8px;padding:0 14px;height:44px;background:var(--surface);border:1px solid var(--line);border-radius:999px;box-shadow:0 4px 18px rgba(0,0,0,.2)}
+.island svg{flex:none;color:var(--ink-2)}
+.island input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:500 14px var(--body);height:100%;outline:0}
+.island #qx{border:0;background:none;font-size:20px;color:var(--ink-2);padding:0 4px}
+.island ul{position:absolute;left:0;right:0;top:calc(100% + 6px);margin:0;padding:6px;list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.25);max-height:min(60vh,420px);overflow:auto}
+.island li{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;cursor:pointer}
+.island li[aria-selected="true"],.island li:hover{background:var(--bg)}
+.island li .nm{display:grid;min-width:0;font-size:14px}.island li small{color:var(--ink-2);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dpin span{display:block;width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--accent);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.dpin span::after{content:"";position:absolute;left:8px;top:8px;width:8px;height:8px;border-radius:50%;background:#fff}
+.dpin{overflow:visible}
+.ppwrap .leaflet-popup-content-wrapper{background:var(--surface);color:var(--ink);border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+.ppwrap .leaflet-popup-tip{background:var(--surface)}
+.ppwrap .leaflet-popup-content{margin:12px 14px;font:400 13px/1.4 var(--body)}
+.ppwrap a.leaflet-popup-close-button{color:var(--ink-2)}
+.pp{display:grid;gap:8px;min-width:210px}
+.pp .ppn{font:700 15px var(--display);padding-right:14px}.pp .ppc{color:var(--ink-2);font-size:11px}
+.pp .pph{font-weight:600;color:var(--accent)}
+.pp button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:8px 10px;font:500 13px var(--body);text-align:left;min-height:38px}
+.pp .ppb{display:grid;gap:6px}
+.pp .ppx{display:flex;gap:6px;flex-wrap:wrap}.pp .ppx button{font-size:12px;min-height:32px;color:var(--ink-2)}
+.pp .ppm{font-size:12px;color:var(--accent);min-height:0}.pp .ppm:empty{display:none}
+.pp input{width:100%;box-sizing:border-box;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:8px 10px;font:500 13px var(--body)}
+.pp ul{margin:4px 0 0;padding:0;list-style:none;border:1px solid var(--line);border-radius:10px;max-height:150px;overflow:auto}
+.pp li{display:flex;gap:6px;align-items:center;padding:7px 9px;cursor:pointer}.pp li:hover{background:var(--bg)}.pp li .code{margin-left:auto;color:var(--ink-2);font-size:11px}
+.xfer2.acc{border-left-color:var(--ink)}.xfer2.acc.dest{border-left-color:var(--accent)}
+.busbox{margin-top:3px;font-size:12px}.busbox ul{margin:2px 0;padding-left:18px}.busbox small{color:var(--ink-2)}
+.xsteps small{color:var(--ink-2);display:block}
+.live{color:#16794A;font-weight:700;font-size:12px}
+#now.on{border-color:#16794A;color:#16794A;font-weight:700}
+@media (max-width:899px){.island{height:42px}}
 
 </style>
 <div class="app">
   <header class="top gut">
     <div class="brand">
       <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="var(--ink)"/><path d="M5 22 L13 22 L19 10 L27 10" fill="none" stroke="#92D04E" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10 L12 10 L20 22 L27 22" fill="none" stroke="#F06BA6" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="16" r="3.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.5"/></svg>
-      <div><h1>Public Transport</h1><small>BTS · MRT · ARL · SRT · สายสีทอง</small></div>
+      <div><h1>Next Route</h1><small>BTS · MRT · ARL · SRT · สายสีทอง</small></div>
     </div>
     <button class="btn" id="theme" type="button">ธีม: อัตโนมัติ</button>
   </header>
@@ -879,8 +912,8 @@ button{cursor:pointer}
       <form class="card planner" id="planner" autocomplete="off">
         <div class="fieldrow">
           <div class="fields">
-            <div class="field"><label for="from">ต้นทาง</label><input id="from" type="text" placeholder="ชื่อสถานี หรือรหัส เช่น N8" role="combobox" aria-expanded="false" aria-controls="fromList"><span class="mk" aria-hidden="true"></span><ul class="sugg" id="fromList" role="listbox" hidden></ul></div>
-            <div class="field dst"><label for="to">ปลายทาง</label><input id="to" type="text" placeholder="ชื่อสถานี หรือรหัส เช่น A1" role="combobox" aria-expanded="false" aria-controls="toList"><span class="mk" aria-hidden="true"></span><ul class="sugg" id="toList" role="listbox" hidden></ul></div>
+            <div class="field"><label for="from">ต้นทาง</label><input id="from" type="text" placeholder="สถานี รหัส (N8) หรือปักหมุดบนแผนที่" role="combobox" aria-expanded="false" aria-controls="fromList"><span class="mk" aria-hidden="true"></span><ul class="sugg" id="fromList" role="listbox" hidden></ul></div>
+            <div class="field dst"><label for="to">ปลายทาง</label><input id="to" type="text" placeholder="สถานี รหัส (A1) หรือปักหมุดบนแผนที่" role="combobox" aria-expanded="false" aria-controls="toList"><span class="mk" aria-hidden="true"></span><ul class="sugg" id="toList" role="listbox" hidden></ul></div>
           </div>
           <button class="btn swap" id="swap" type="button" aria-label="สลับต้นทางกับปลายทาง"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"/></svg></button>
         </div>
@@ -889,7 +922,7 @@ button{cursor:pointer}
           <div><label for="day">วัน</label><select id="day"><option value="wd">จันทร์–ศุกร์</option><option value="we">เสาร์–อาทิตย์/วันหยุด</option></select></div>
         </div>
         <div style="display:flex;gap:8px"><button class="btn primary" type="submit" style="flex:1">ค้นหาเส้นทาง</button><button class="btn" type="button" id="now">ตอนนี้</button></div>
-        <p class="hint">ตัวอย่างที่แสดงอยู่: หมอชิต → สุวรรณภูมิ เปลี่ยนสถานีได้เลย</p>
+        <p class="hint">ตัวอย่างที่แสดงอยู่: หมอชิต → สุวรรณภูมิ · หรือค้นหาสถานที่/แตะบนแผนที่เพื่อปักหมุดปลายทาง</p>
       </form>
       <div id="results" aria-live="polite" style="display:grid;gap:12px"></div>
       <details class="card notes">
@@ -911,6 +944,7 @@ button{cursor:pointer}
 
     <section class="mapwrap" id="mapwrap" aria-label="แผนที่เส้นทางรถไฟฟ้า">
       <div id="map" role="application" aria-label="แผนที่สายรถไฟฟ้าตามแนวรางจริง ลากเพื่อเลื่อน ใช้ล้อเมาส์หรือสองนิ้วเพื่อซูม"></div>
+      <div class="island" id="island"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="text" inputmode="search" placeholder="ค้นหาสถานที่ ห้าง ร้าน โรงเรียน มหาลัย หรือแตะบนแผนที่" aria-label="ค้นหาสถานที่ปลายทาง" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="qlist"><button id="qx" type="button" aria-label="ล้างคำค้น" hidden>×</button><ul id="qlist" role="listbox" hidden></ul></div>
       <div class="chips" id="chips" role="group" aria-label="เลือกสายที่จะแสดง"></div>
       <div class="zoom"><button id="zin" type="button" aria-label="ซูมเข้า">+</button><button id="zout" type="button" aria-label="ซูมออก">−</button><button id="names" type="button" aria-pressed="true" aria-label="แสดงชื่อสถานี" style="font-size:13px">ชื่อ</button><button id="fit" type="button" aria-label="ดูทั้งหมด" style="font-size:13px">⤢</button></div>
       <select class="stylesel" id="mapstyle" aria-label="รูปแบบแผนที่" hidden></select>
@@ -1207,7 +1241,7 @@ function picker(inp, list, onPick) {
 }
 
 /* ---------- state ---------- */
-const st = { names: true, from: null, to: null, plan: null, route: null, vis: new Set(Object.keys(LINES)), pendingFit: false, touched: false };
+const st = { live: true, names: true, from: null, to: null, plan: null, route: null, vis: new Set(Object.keys(LINES)), pendingFit: false, touched: false };
 
 /* ---------- map: Leaflet, real station positions and real track geometry ---------- */
 const TILES = true; // true only in the standalone file, where map tiles may load
@@ -1308,7 +1342,7 @@ function draw() {
   for (const x of routeLayers) x.set(lw);
 }
 map.on('zoomend', draw);
-map.on('click', () => { $('stcard').hidden = true; });
+map.on('click', e => { $('stcard').hidden = true; if (typeof dropPin === 'function') dropPin(e.latlng.lat, e.latlng.lng); });
 function setRoute(r) {
   if (typeof simStop === 'function' && !(r && r === st.route)) simStop();
   st.route = r; routeG.clearLayers(); routeLayers = [];
@@ -1320,18 +1354,21 @@ function setRoute(r) {
       if (c) routeG.addLayer(c); routeG.addLayer(l);
       routeLayers.push({ set: lw => { if (c) c.setStyle({ weight: lw + 7 }); l.setStyle({ weight: dash ? 4 : lw + 1 }); } });
     };
+    const mkRaw = pts => { const l = L.polyline(pts, { pane: 'route', interactive: false, lineCap: 'round', color: '#222', className: 'rt-w', dashArray: '2 7', noClip: true }); routeG.addLayer(l); routeLayers.push({ set: () => l.setStyle({ weight: 4 }) }); };
     r.legs.forEach(lg => { lg.before.forEach(x => mk([x.from, x.to], null, true)); mk(lg.nodes, LINES[lg.line].color, false); });
     r.endWalk.forEach(x => mk([x.from, x.to], null, true));
-    const pin = (id, label, cls) => routeG.addLayer(L.marker(ll(id), { pane: 'labels', interactive: false, keyboard: false, icon: L.divIcon({ className: 'pin ' + cls, html: label, iconSize: [24, 24], iconAnchor: [12, 12] }) }));
-    pin(r.path[0], 'A', 'pa'); pin(r.path[r.path.length - 1], 'B', 'pb');
-    fitTo(r.path, 48);
+    const aO = r.acc && r.acc.o.pt, aD = r.acc && r.acc.d.pt, pO = aO ? [aO.lat, aO.lng] : ll(r.path[0]), pD = aD ? [aD.lat, aD.lng] : ll(r.path[r.path.length - 1]);
+    if (aO) mkRaw([pO, ll(r.path[0])]); if (aD) mkRaw([ll(r.path[r.path.length - 1]), pD]);
+    const pin = (pos, label, cls) => routeG.addLayer(L.marker(pos, { pane: 'labels', interactive: false, keyboard: false, icon: L.divIcon({ className: 'pin ' + cls, html: label, iconSize: [24, 24], iconAnchor: [12, 12] }) }));
+    pin(pO, 'A', 'pa'); if (!aD) pin(pD, 'B', 'pb');
+    fitTo(r.path.concat(aO ? [pO] : [], aD ? [pD] : []), 48);
   }
   draw();
 }
 function fitTo(ids, pad) {
   if (!map.getSize().x) { st.pendingFit = ids; return; }
-  const b = L.latLngBounds(ids.map(ll));
-  map.fitBounds(b, { paddingTopLeft: [pad, pad + 44], paddingBottomRight: [pad, pad], maxZoom: 16, animate: false });
+  const b = L.latLngBounds(ids.map(x => Array.isArray(x) ? x : ll(x)));
+  map.fitBounds(b, { paddingTopLeft: [pad, pad + 96], paddingBottomRight: [pad, pad], maxZoom: 16, animate: false });
   draw();
 }
 const fitAll = () => fitTo(ALL, 16);
@@ -1384,36 +1421,50 @@ const gmapPlace = id => `https://www.google.com/maps/search/?api=1&query=${gq(id
 const ext = (href, text) => `<a class="btn lnk" href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
 
 /* ---------- planner ---------- */
-const pf = picker($('from'), $('fromList'), (id, typing) => { st.from = id; if (typing) st.from = null; });
-const pt = picker($('to'), $('toList'), (id, typing) => { st.to = id; if (typing) st.to = null; });
-$('swap').onclick = () => { [st.from, st.to] = [st.to, st.from]; pf.set(st.from); pt.set(st.to); if (st.from && st.to) go(); };
+const pf = picker($('from'), $('fromList'), (id, typing) => { st.from = id; st.fromPt = null; if (typing) st.from = null; });
+const pt = picker($('to'), $('toList'), (id, typing) => { st.to = id; st.toPt = null; if (typing) st.to = null; });
+function syncInputs() { st.fromPt ? $('from').value = '📍 ' + st.fromPt.name : pf.set(st.from); st.toPt ? $('to').value = '📍 ' + st.toPt.name : pt.set(st.to); }
+const hasEnds = () => (st.from || st.fromPt) && (st.to || st.toPt);
+$('swap').onclick = () => { [st.from, st.to] = [st.to, st.from]; [st.fromPt, st.toPt] = [st.toPt, st.fromPt]; syncInputs(); if (hasEnds()) go(); };
+function nowMinute() { const d = new Date(Date.now() + 7 * 3600e3); return d.getUTCHours() * 60 + d.getUTCMinutes() + d.getUTCSeconds() / 60; }
 function setDefaultTime() { const t = bkk(); $('time').value = fmt(t.minute); $('day').value = t.weekend ? 'we' : 'wd'; }
-$('now').onclick = () => { setDefaultTime(); if (st.from && st.to) go(); };
+$('now').onclick = () => { st.live = true; setDefaultTime(); if (hasEnds()) go(); else syncLive(); };
+$('time').addEventListener('input', () => { st.live = false; syncLive(); });
+$('day').addEventListener('change', () => { st.live = false; syncLive(); });
+function syncLive() { $('now').classList.toggle('on', !!st.live); $('now').textContent = st.live ? '● ตอนนี้ (สด)' : 'ตอนนี้'; }
 $('planner').addEventListener('submit', e => { e.preventDefault(); go(); });
 
 const PICKS = [['cheapest', 'ถูกที่สุด'], ['fastest', 'เร็วที่สุด'], ['fewest', 'เปลี่ยนสายน้อยสุด'], ['value', 'คุ้มค่าที่สุด']];
-function go() {
+const sigOf = r => r.path.join() + '|' + (r.acc ? [r.acc.o.st && r.acc.o.st.place, r.acc.d.st && r.acc.d.st.place, r.acc.o.opt.mode, r.acc.d.opt.mode].join() : '');
+function go(opt) {
   const out = $('results');
-  if (!st.from || !st.to) { out.innerHTML = '<div class="err">เลือกสถานีต้นทางและปลายทางจากรายการที่ขึ้นมาให้ก่อน</div>'; return; }
-  if (st.from === st.to) { out.innerHTML = '<div class="err">ต้นทางและปลายทางเป็นสถานีเดียวกัน</div>'; return; }
-  const [h, m] = ($('time').value || '09:00').split(':').map(Number);
-  st.plan = planRoutes(st.from, st.to, h * 60 + m, $('day').value === 'we', Date.now());
-  if (!st.plan) { out.innerHTML = '<div class="err">ไม่พบเส้นทางระหว่างสองสถานีนี้ด้วยโครงข่ายที่มีในหน้านี้</div>'; setRoute(null); return; }
-  st.sel = st.plan.picks.cheapest;
+  if (!hasEnds()) { out.innerHTML = '<div class="err">เลือกต้นทางและปลายทาง (สถานี หรือปักหมุดบนแผนที่) ก่อน</div>'; return; }
+  if (!st.fromPt && !st.toPt && st.from === st.to) { out.innerHTML = '<div class="err">ต้นทางและปลายทางเป็นสถานีเดียวกัน</div>'; return; }
+  let minute; const weekend = $('day').value === 'we';
+  if (st.live) { setDefaultTime(); minute = nowMinute(); } else { const [h, m] = ($('time').value || '09:00').split(':').map(Number); minute = h * 60 + m; }
+  const keep = opt && opt.keep && st.sel ? sigOf(st.sel) : null, keepPick = opt && opt.keep ? st.selKey : null;
+  syncLive();
+  const plan = (st.fromPt || st.toPt) ? planPoints(minute, weekend) : planRoutes(st.from, st.to, minute, weekend, Date.now());
+  if (!plan || plan.err) { out.innerHTML = `<div class="err">${plan && plan.err ? plan.err : 'ไม่พบเส้นทางระหว่างสองจุดนี้ด้วยโครงข่ายที่มีในหน้านี้'}</div>`; setRoute(null); st.plan = null; return; }
+  plan.minute = minute; st.plan = plan; st.selKey = 'cheapest'; st.sel = plan.picks.cheapest;
+  if (keepPick && plan.picks[keepPick] && keep === null) { st.selKey = keepPick; st.sel = plan.picks[keepPick]; }
+  if (keep) { const f = plan.routes.find(r => sigOf(r) === keep); if (f) { st.sel = f; st.selKey = keepPick; } }
   renderResults();
 }
 function chain(r) { return r.legs.map(l => `<i style="background:${LINES[l.line].color}"></i>`).join(''); }
 function renderResults() {
   const { picks, routes } = st.plan, r = st.sel;
-  const tags = new Map(); PICKS.forEach(([k, label]) => { const x = picks[k]; tags.set(x, (tags.get(x) || []).concat(label)); });
-  $('results').innerHTML = `<div class="picks" role="group" aria-label="เรียงตามความคุ้มค่า">${PICKS.map(([k, label]) => { const x = picks[k]; return `<button class="pick" data-k="${k}" aria-pressed="${x === r}"><span class="tag">${label}</span><span class="big">${Math.round(x.total)} นาที · ฿${x.fare.total}</span><span class="sub">เปลี่ยนสาย/ขบวน ${x.transfers} ครั้ง</span><span class="chain">${chain(x)}</span></button>`; }).join('')}</div>
+  const PK = PICKS.map(([k, l]) => [k, k === 'fewest' && r.acc ? 'สะดวกที่สุด' : l]);
+  const tags = new Map(); PK.forEach(([k, label]) => { const x = picks[k]; tags.set(x, (tags.get(x) || []).concat(label)); });
+  $('results').innerHTML = `<div class="picks" role="group" aria-label="เรียงตามความคุ้มค่า">${PK.map(([k, label]) => { const x = picks[k]; return `<button class="pick" data-k="${k}" aria-pressed="${x === r}"><span class="tag">${label}</span><span class="big">${Math.round(x.total)} นาที · ฿${x.fare.total}</span><span class="sub">เปลี่ยนสาย/ขบวน ${x.transfers} ครั้ง</span><span class="chain">${chain(x)}</span></button>`; }).join('')}</div>
   <div class="card detail" id="detail">${detail(r, tags.get(r) || [])}</div>
   <details class="card alts notes"><summary>เส้นทางอื่นที่เป็นไปได้ (${routes.length})</summary><ul>${routes.slice().sort((a, b) => a.total - b.total).slice(0, 14).map((x, i) => `<li><button data-i="${routes.indexOf(x)}"><span class="chain" style="display:flex;gap:3px">${chain(x)}</span><span>${Math.round(x.total)} นาที · ฿${x.fare.total} · ต่อ ${x.transfers}</span></button></li>`).join('')}</ul></details>`;
   setRoute(r);
+  if (typeof fillBus === 'function') fillBus();
 }
 $('results').addEventListener('click', e => {
-  const pk = e.target.closest('.pick'); if (pk) { st.sel = st.plan.picks[pk.dataset.k]; renderResults(); return; }
-  const al = e.target.closest('.alts li button'); if (al) { st.sel = st.plan.routes[+al.dataset.i]; renderResults(); return; }
+  const pk = e.target.closest('.pick'); if (pk) { st.selKey = pk.dataset.k; st.sel = st.plan.picks[pk.dataset.k]; renderResults(); return; }
+  const al = e.target.closest('.alts li button'); if (al) { st.selKey = null; st.sel = st.plan.routes[+al.dataset.i]; renderResults(); return; }
   if (e.target.closest('[data-showmap]')) setPane('map');
   if (e.target.closest('[data-sim]')) { setPane('map'); setTimeout(() => simStart(st.sel), 400); }
 });
@@ -1457,13 +1508,15 @@ function xferBrief(r) {
     out.push(`<li><b>${esc(q.f.th)}</b>: ลง <b>${esc(q.al ? q.al.t.split(' (')[0] + ' ' + q.al.lv : 'ชานชาลาที่รถจอด')}</b> → ขึ้น <b>${esc(q.bd ? q.bd.t.split(' (')[0] + ' ' + q.bd.lv : dirText(lg))}</b> · ทางออก: ${esc(q.exitT)}</li>`); });
   return out.length ? `<div class="xbrief"><h3>จุดเปลี่ยนสาย ${out.length} จุด</h3><ol>${out.join('')}</ol></div>` : '';
 }
+const endName = (r, w) => r.acc && r.acc[w].pt ? r.acc[w].pt.name : NODES[w === 'o' ? r.path[0] : r.path[r.path.length - 1]].th;
+const arriveOf = r => r.arrive != null ? r.arrive : r.legs[r.legs.length - 1].alight + r.endWalk.reduce((s, x) => s + x.walk, 0);
 function detail(r, tags) {
   const f = r.fare, first = r.legs[0], last = r.legs[r.legs.length - 1];
   let h = `<div class="badges">${tags.map(t => `<span class="badge">${t}</span>`).join('')}</div>
-  <h2>${esc(NODES[r.path[0]].th)} → ${esc(NODES[r.path[r.path.length - 1]].th)}</h2>
-  <div class="sum"><span>ถึงโดยประมาณ <b>${fmt(last.alight + r.endWalk.reduce((s, x) => s + x.walk, 0))}</b></span><span>รวม <b>${Math.round(r.total)} นาที</b></span><span>นั่งรถ ${Math.round(r.ride)} · รอ ${Math.round(r.wait)} · เดิน ${Math.round(r.walk)}</span><span>ค่าโดยสาร <b>฿${f.total}</b></span></div>`;
+  <h2>${esc(endName(r, 'o'))} → ${esc(endName(r, 'd'))}</h2>
+  <div class="sum"><span>${st.live ? '<span class="live">● สด</span> ' : ''}ถึงโดยประมาณ <b>${fmt(arriveOf(r))}</b></span><span>รวม <b>${Math.round(r.total)} นาที</b></span><span>นั่งรถ ${Math.round(r.ride)} · รอ ${Math.round(r.wait)} · เดิน ${Math.round(r.walk)}</span><span>ค่าโดยสาร <b>฿${f.total}</b></span></div>`;
   if (r.warns.length) h += `<div class="warn">เวลาออกเดินทางนี้อยู่นอกช่วงเปิดให้บริการของสาย ${esc([...new Set(r.warns)].join(', '))}</div>`;
-  h += xferBrief(r) + '<div class="steps">';
+  h += xferBrief(r) + '<div class="steps">' + accessHTML(r, 'o');
   r.legs.forEach((lg, i) => {
     const L = LINES[lg.line], mid = lg.nodes.slice(1, -1);
     lg.before.forEach(x => { h += xferHTML(x, lg, i ? r.legs[i - 1] : null); });
@@ -1473,8 +1526,8 @@ function detail(r, tags) {
       <div class="lend">${fmt(lg.alight)} ลงที่ ${esc(NODES[lg.to].th)} <span class="code">${esc(NODES[lg.to].code)}</span></div></div>`;
   });
   r.endWalk.forEach(x => { h += `<div class="walk">เดิน ~${x.walk} นาที จาก ${esc(NODES[x.from].th)} ไป ${esc(NODES[x.to].th)}<br>${esc(x.note)}</div>`; });
-  h += '</div><div class="fare">';
-  f.groups.forEach(g => { h += `<div class="row"><span>${esc(g.label)} · ${g.hops} สถานี<small>${[g.note, ...g.adj].filter(Boolean).map(esc).join(' · ')}</small></span><span>฿${g.fare}</span></div>`; });
+  h += accessHTML(r, 'd') + '</div><div class="fare">';
+  f.groups.forEach(g => { h += `<div class="row"><span>${esc(g.label)}${g.access ? '' : ' · ' + g.hops + ' สถานี'}<small>${[g.note, ...g.adj].filter(Boolean).map(esc).join(' · ')}</small></span><span>฿${g.fare}</span></div>`; });
   h += `<div class="row tot"><span>รวมโดยประมาณ</span><span>฿${f.total}</span></div></div><div class="btnrow"><button class="btn primary" data-sim type="button">▶ จำลองการเดินทาง</button><button class="btn" data-showmap type="button">ดูเส้นทางบนแผนที่</button>${ext(gmapDir(r.path[0], r.path[r.path.length - 1], 'transit'), 'เทียบกับ Google Maps')}</div>`;
   return h;
 }
@@ -1502,6 +1555,8 @@ function simBuild(r) {
   const ev = []; let t = 0;
   const push = (o, dur) => { o.t0 = t; o.t1 = t + Math.max(dur, 0.01); t = o.t1; if (o.pts) o.cum = plen(o.pts); ev.push(o); };
   const first = r.legs[0];
+  const accEv = (A, from, to) => push({ k: 'access', pts: [from, to], text: `${A.opt.mode === 'walk' ? '🚶 เดิน' : '🚕 ' + A.opt.label} ~${Math.round(A.opt.min)} นาที${A.opt.cost ? ' (~฿' + A.opt.cost + ')' : ''}`, line: first.line }, A.opt.min);
+  if (r.acc && r.acc.o.pt) accEv(r.acc.o, [r.acc.o.pt.lat, r.acc.o.pt.lng], ll(first.from));
   r.legs.forEach((lg, i) => {
     const prev = i ? r.legs[i - 1] : null;
     lg.before.forEach(x => push({ k: prev ? 'xfer' : 'walk', x, lg, prev, pts: [ll(x.from), ll(x.to)], line: lg.line }, x.walk));
@@ -1512,8 +1567,9 @@ function simBuild(r) {
     }
   });
   r.endWalk.forEach(x => push({ k: 'walk', x, lg: r.legs[r.legs.length - 1], pts: [ll(x.from), ll(x.to)], line: r.legs[r.legs.length - 1].line }, x.walk));
+  if (r.acc && r.acc.d.pt) { const lg = r.legs[r.legs.length - 1]; accEv(r.acc.d, ll(r.path[r.path.length - 1]), [r.acc.d.pt.lat, r.acc.d.pt.lng]); ev[ev.length - 1].dest = true; }
   sim.ev = ev; sim.total = t;
-  const [hh, mm] = ($('time').value || '09:00').split(':').map(Number); sim.clock0 = hh * 60 + mm;
+  sim.clock0 = r.depart != null ? r.depart : (st.plan && st.plan.minute != null ? st.plan.minute : 540);
 }
 function simPos(e, t) {
   const f = Math.max(0, Math.min(1, (t - e.t0) / (e.t1 - e.t0))), p = e.pts;
@@ -1527,6 +1583,7 @@ const clockAt = t => fmt(sim.clock0 + t);
 function simMsg(e, t) {
   const L = LINES[e.line];
   if (e.k === 'xfer') return xferHTML(e.x, e.lg, e.prev, true);
+  if (e.k === 'access') return `<div class="smsg">${e.text}${e.dest ? '<br><b class="pf">' + esc(exitInfo(r_(e), st.toPt || st.fromPt).txt) + '</b>' : ''}</div>`;
   if (e.k === 'walk') return `<div class="smsg">🚶 เดิน ~${e.x.walk} นาที จาก ${esc(NODES[e.x.from].th)} ไป ${esc(NODES[e.x.to].th)}</div>`;
   if (e.k === 'wait') {
     const inf = e.prev ? xferInfo(e.prev && e.lg.before[0] || { from: e.lg.from, to: e.lg.from, walk: 0, note: '', info: {} }, e.lg, e.prev) : null;
@@ -1539,7 +1596,7 @@ function simMsg(e, t) {
 function simRender(force) {
   const e = sim.ev[sim.idx], t = Math.min(sim.t, sim.total);
   $('simclock').textContent = clockAt(t);
-  $('simsub').textContent = e.k === 'ride' ? `${NODES[e.a].th} → ${NODES[e.b].th}` : e.k === 'xfer' ? 'จุดเปลี่ยนสาย' : e.k === 'wait' ? 'รอรถ' : 'เดิน';
+  $('simsub').textContent = e.k === 'ride' ? `${NODES[e.a].th} → ${NODES[e.b].th}` : e.k === 'xfer' ? 'จุดเปลี่ยนสาย' : e.k === 'access' ? 'เดิน/ต่อรถ' : e.k === 'wait' ? 'รอรถ' : 'เดิน';
   $('simfill').style.width = (t / sim.total * 100).toFixed(2) + '%';
   if (force || sim.shown !== sim.idx) { sim.shown = sim.idx; $('simmsg').innerHTML = simMsg(e, t); $('simmsg').scrollTop = 0; }
   const p = simPos(e, t); sim.marker.setLatLng(p);
@@ -1588,8 +1645,273 @@ $('simnext').onclick = () => { const wasPlaying = sim.playing; const i = Math.mi
 $('simprev').onclick = () => { const e = sim.ev[sim.idx], i = sim.t - e.t0 > .4 ? sim.idx : Math.max(0, sim.idx - 1); simPause(); simSeek(sim.ev[i].t0 + 0.001); };
 $('simspd').onclick = () => { sim.speed = SPEEDS[(SPEEDS.indexOf(sim.speed) + 1) % SPEEDS.length]; $('simspd').textContent = sim.speed + '×'; };
 $('simbar').addEventListener('pointerdown', e => { const r = $('simbar').getBoundingClientRect(); simPause(); simSeek((e.clientX - r.left) / r.width * sim.total); });
-/* example state: Mo Chit to Suvarnabhumi */
-setDefaultTime();
+
+function r_(e) { return st.sel && st.sel.acc && st.sel.acc.d.st ? st.sel.acc.d.st.place : NODES[st.sel.path[st.sel.path.length - 1]].place; }
+/* trip.js: place search, map pins, point-to-point planning (nearest station, exit, bus / songthaew / taxi), live time. */
+const ONLINE = TILES; // network features (place search, bus routes, exits) only work in the standalone file
+const POIS = [ // well-known places, approximate positions (used when the online geocoder is unavailable)
+  ['สยามพารากอน', 'Siam Paragon', 13.7461, 100.5347], ['เซ็นทรัลเวิลด์', 'CentralWorld', 13.7467, 100.5393], ['สยามดิสคัฟเวอรี่', 'Siam Discovery', 13.7468, 100.5312],
+  ['เอ็มบีเค เซ็นเตอร์', 'MBK Center', 13.7446, 100.5300], ['สยามสแควร์', 'Siam Square', 13.7450, 100.5340], ['เซ็นทรัลชิดลม', 'Central Chidlom', 13.7437, 100.5428],
+  ['พลาตินัม แฟชั่น มอลล์', 'Platinum Fashion Mall', 13.7513, 100.5405], ['สามย่านมิตรทาวน์', 'Samyan Mitrtown', 13.7329, 100.5290], ['ไอคอนสยาม', 'Iconsiam', 13.7265, 100.5100],
+  ['เอเชียทีค', 'Asiatique', 13.7041, 100.5030], ['เทอร์มินอล 21 อโศก', 'Terminal 21 Asok', 13.7377, 100.5604], ['เอ็มโพเรียม', 'Emporium', 13.7305, 100.5696],
+  ['เซ็นทรัล ลาดพร้าว', 'Central Ladprao', 13.8160, 100.5610], ['เซ็นทรัล พระราม 9', 'Central Rama 9', 13.7585, 100.5655], ['เมกา บางนา', 'Mega Bangna', 13.6467, 100.6800],
+  ['เซ็นทรัล เวสต์เกต', 'Central Westgate', 13.8777, 100.4120], ['เซ็นทรัล ปิ่นเกล้า', 'Central Pinklao', 13.7773, 100.4780], ['ฟิวเจอร์พาร์ค รังสิต', 'Future Park Rangsit', 13.9896, 100.6172],
+  ['ตลาดนัดจตุจักร', 'Chatuchak Weekend Market', 13.7999, 100.5503], ['สวนจตุจักร', 'Chatuchak Park', 13.8030, 100.5530], ['สวนลุมพินี', 'Lumphini Park', 13.7305, 100.5415], ['สวนเบญจกิติ', 'Benjakitti Park', 13.7245, 100.5580],
+  ['ศูนย์การประชุมแห่งชาติสิริกิติ์', 'Queen Sirikit National Convention Center', 13.7233, 100.5600], ['อิมแพ็ค เมืองทองธานี', 'Impact Muang Thong Thani', 13.9124, 100.5476],
+  ['จุฬาลงกรณ์มหาวิทยาลัย', 'Chulalongkorn University', 13.7384, 100.5320], ['มหาวิทยาลัยธรรมศาสตร์ ท่าพระจันทร์', 'Thammasat University Tha Prachan', 13.7570, 100.4900],
+  ['มหาวิทยาลัยธรรมศาสตร์ รังสิต', 'Thammasat University Rangsit', 14.0710, 100.6030], ['มหาวิทยาลัยเกษตรศาสตร์ บางเขน', 'Kasetsart University', 13.8470, 100.5700],
+  ['มหาวิทยาลัยมหิดล ศาลายา', 'Mahidol University Salaya', 13.7940, 100.3240], ['มหาวิทยาลัยศิลปากร วังท่าพระ', 'Silpakorn University Wang Tha Phra', 13.7510, 100.4890],
+  ['มหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร', 'Srinakharinwirot University Prasarnmit', 13.7473, 100.5659], ['มหาวิทยาลัยรามคำแหง', 'Ramkhamhaeng University', 13.7556, 100.6212],
+  ['มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี บางมด', 'KMUTT', 13.6503, 100.4943], ['สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง', 'KMITL', 13.7278, 100.7724],
+  ['โรงพยาบาลศิริราช', 'Siriraj Hospital', 13.7590, 100.4850], ['โรงพยาบาลจุฬาลงกรณ์', 'King Chulalongkorn Memorial Hospital', 13.7335, 100.5370],
+  ['โรงพยาบาลรามาธิบดี', 'Ramathibodi Hospital', 13.7655, 100.5285], ['โรงพยาบาลกรุงเทพ', 'Bangkok Hospital', 13.7490, 100.5850],
+  ['พระบรมมหาราชวัง', 'Grand Palace', 13.7500, 100.4913], ['วัดโพธิ์', 'Wat Pho', 13.7465, 100.4930], ['วัดอรุณ', 'Wat Arun', 13.7437, 100.4888], ['ถนนข้าวสาร', 'Khao San Road', 13.7590, 100.4975],
+  ['เยาวราช', 'Yaowarat', 13.7390, 100.5100], ['อนุสาวรีย์ชัยสมรภูมิ', 'Victory Monument', 13.7650, 100.5380], ['สนามศุภชลาศัย', 'Supachalasai Stadium', 13.7469, 100.5290],
+  ['ราชมังคลากีฬาสถาน', 'Rajamangala Stadium', 13.7556, 100.6217], ['สนามบินสุวรรณภูมิ', 'Suvarnabhumi Airport', 13.6900, 100.7501], ['สนามบินดอนเมือง', 'Don Mueang Airport', 13.9126, 100.6068],
+  ['โรงเรียนสวนกุหลาบวิทยาลัย', 'Suankularb Wittayalai School', 13.7497, 100.5083]];
+const POI_N = POIS.map(p => ({ th: p[0], en: p[1], lat: p[2], lng: p[3], k: (p[0] + ' ' + p[1]).toLowerCase().replace(/\s/g, '') }));
+const HOME_KEY = 'rail-home';
+let home = null; try { home = JSON.parse(localStorage.getItem(HOME_KEY) || 'null'); } catch (e) {}
+const OVP = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
+async function overpass(q) {
+  for (const h of OVP) { try { const r = await fetch(h, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }); if (r.ok) return await r.json(); } catch (e) {} }
+  return null;
+}
+const placeLL = id => { const n = NODES[PLACES[id][0]]; return { lat: n.lat, lng: n.lng }; };
+const kmBetween = (a, b) => hav({ lat: a.lat, lng: a.lng }, { lat: b.lat, lng: b.lng });
+const DIRS = ['เหนือ', 'ตะวันออกเฉียงเหนือ', 'ตะวันออก', 'ตะวันออกเฉียงใต้', 'ใต้', 'ตะวันตกเฉียงใต้', 'ตะวันตก', 'ตะวันตกเฉียงเหนือ'];
+function compass(a, b) { const y = (b.lat - a.lat) * 110574, x = (b.lng - a.lng) * 108000; return DIRS[Math.round(((Math.atan2(x, y) * 180 / Math.PI) + 360) % 360 / 45) % 8]; }
+const fmtKm = km => km < 1 ? Math.round(km * 1000 / 10) * 10 + ' ม.' : km.toFixed(1) + ' กม.';
+
+/* ---------- station exits (OpenStreetMap entrances, standalone only) ---------- */
+const EXIT_KEY = 'rail-exits-v1'; let EXITS = null;
+function exitsProcess(j) {
+  const out = {};
+  for (const e of j.elements || []) {
+    if (e.type !== 'node' || !e.tags) continue;
+    const t = e.tags, m = /(\d+\s*[A-Za-zก-ฮ]?)\b/.exec(t.ref || t['name:th'] || t.name || t['name:en'] || '');
+    if (!m) continue;
+    let best = null, bd = .35;
+    for (const p of PL) { const d = kmBetween(placeLL(p.id), { lat: e.lat, lng: e.lon }); if (d < bd) { bd = d; best = p.id; } }
+    if (best) (out[best] = out[best] || []).push({ ref: m[1].replace(/\s/g, ''), lat: e.lat, lng: e.lon, name: t['name:th'] || t.name || '' });
+  }
+  return out;
+}
+async function loadExits() {
+  if (!ONLINE) return;
+  try { const c = JSON.parse(localStorage.getItem(EXIT_KEY) || 'null'); if (c && Date.now() - c.t < 30 * 864e5) { EXITS = c.d; return; } } catch (e) {}
+  const j = await overpass('[out:json][timeout:60];(node["railway"="subway_entrance"](13.45,100.25,14.10,100.90);node["railway"="train_station_entrance"](13.45,100.25,14.10,100.90););out body;');
+  if (!j) return; EXITS = exitsProcess(j); try { localStorage.setItem(EXIT_KEY, JSON.stringify({ t: Date.now(), d: EXITS })); } catch (e) {}
+  if (st.plan) renderResults();
+}
+function exitInfo(placeId, pt) {
+  const c = placeLL(placeId), km = kmBetween(c, pt), list = EXITS && EXITS[placeId];
+  if (list && list.length) {
+    let b = null, bd = 1e9; for (const x of list) { const d = kmBetween(x, pt); if (d < bd) { bd = d; b = x; } }
+    return { ref: b.ref, txt: 'ทางออก ' + b.ref, sub: `ใกล้หมุดที่สุด (ห่างจากหมุด ~${fmtKm(bd)}) · ข้อมูลทางออกจาก OpenStreetMap ตรวจกับป้ายในสถานีอีกครั้ง`, ll: b };
+  }
+  const dir = compass(c, pt);
+  return { ref: null, txt: km < .12 ? 'ออกทางออกใดก็ได้ (หมุดอยู่ติดสถานี)' : `ทางออกฝั่งทิศ${dir}`, sub: `หมุดอยู่ทิศ${dir}ของสถานี ห่าง ~${fmtKm(km)} · ยังไม่มีเลขทางออกของสถานีนี้ในข้อมูล ให้ดูผังทางออกที่ป้ายในสถานีแล้วเลือกฝั่งนี้` };
+}
+
+/* ---------- access legs (to / from the station) ---------- */
+function nearestStations(pt, k = 3, maxKm = 3.5) { // the nearest station always first; others only if almost as close
+  const all = PL.map(p => ({ place: p.id, km: kmBetween(placeLL(p.id), pt) })).sort((a, b) => a.km - b.km), n0 = all[0];
+  const out = all.filter(x => x.km <= Math.min(maxKm, n0.km + .35)).slice(0, k);
+  out.forEach(x => { x.nearest = n0; });
+  return out;
+}
+function accessVariants(km) {
+  const road = km * 1.3;
+  const W = { mode: 'walk', label: 'เดิน', min: road / 4.8 * 60, cost: 0 };
+  const B = { mode: 'bus', label: 'รถเมล์/สองแถว', min: 8 + road / 14 * 60, cost: road < 3 ? 10 : road < 6 ? 15 : 20 };
+  const V = { mode: 'win', label: 'วินมอเตอร์ไซค์', min: 3 + road / 25 * 60, cost: Math.round((20 + Math.max(0, road - 1.5) * 8) / 5) * 5 };
+  const T = { mode: 'taxi', label: 'แท็กซี่', min: 4 + road / 20 * 60, cost: Math.round(35 + Math.max(0, road - 1) * 7 + road * 1.5) };
+  if (road <= .15) return [{ mode: 'walk', label: 'เดิน', min: 1, cost: 0 }];
+  const cheap = road <= 1.6 ? W : B, fast = road <= .7 ? W : road <= 6 ? V : T;
+  return cheap.mode === fast.mode ? [cheap] : [cheap, fast];
+}
+const ZERO = [{ mode: 'none', label: '', min: 0, cost: 0 }];
+function planPoints(minute, weekend) {
+  const O = st.fromPt, D = st.toPt, now = Date.now();
+  const oc = O ? nearestStations(O) : [{ place: st.from, km: 0 }], dc = D ? nearestStations(D) : [{ place: st.to, km: 0 }];
+  const combos = []; let anyPair = false;
+  for (const a of oc) for (const b of dc) {
+    if (a.place === b.place) continue; anyPair = true;
+    const ao = O ? accessVariants(a.km) : ZERO, bo = D ? accessVariants(b.km) : ZERO, m0 = minute + ao[0].min;
+    const pl = planRoutes(a.place, b.place, m0, weekend, now); if (!pl) continue;
+    const set = new Set([...Object.values(pl.picks), ...pl.routes.slice().sort((x, y) => x.total - y.total).slice(0, 4)]);
+    for (const r of set) for (const x of ao) for (const y of bo) {
+      const last = r.legs[r.legs.length - 1], arrive = last.alight + r.endWalk.reduce((s, w) => s + w.walk, 0) + y.min + (x.min - ao[0].min);
+      const groups = [].concat(O && x.cost ? [{ label: x.label + ' ไปสถานี (ประมาณ)', fare: x.cost, hops: 0, adj: [], note: '', access: true }] : [], r.fare.groups, D && y.cost ? [{ label: y.label + ' จากสถานี (ประมาณ)', fare: y.cost, hops: 0, adj: [], note: '', access: true }] : []);
+      combos.push(Object.assign({}, r, { total: x.min + r.total + y.min, arrive, depart: minute, fare: Object.assign({}, r.fare, { total: r.fare.total + x.cost + y.cost, groups }),
+        acc: { o: { st: O ? a : null, pt: O, opt: x }, d: { st: D ? b : null, pt: D, opt: y } },
+        walkAll: r.walk + (x.mode === 'walk' ? x.min : 0) + (y.mode === 'walk' ? y.min : 0) }));
+    }
+  }
+  if (!combos.length) return { err: anyPair ? 'ไม่พบเส้นทางรถไฟฟ้าระหว่างสองจุดนี้' : 'ต้นทางและปลายทางอยู่ใกล้สถานีเดียวกัน ไม่จำเป็นต้องนั่งรถไฟฟ้า ให้เดินหรือใช้ Google Maps (ปุ่มด้านล่างหมุด)' };
+  const best = f => combos.slice().sort(f)[0], score = r => r.fare.total + .8 * r.total + 4 * r.transfers;
+  const picks = {
+    cheapest: best((a, b) => a.fare.total - b.fare.total || a.total - b.total),
+    fastest: best((a, b) => a.total - b.total || a.fare.total - b.fare.total),
+    fewest: best((a, b) => a.transfers - b.transfers || a.walkAll - b.walkAll || a.total - b.total),
+    value: best((a, b) => score(a) - score(b))
+  };
+  const seen = new Set(), routes = combos.slice().sort((a, b) => a.total - b.total).filter(r => { const k = sigOf(r); if (seen.has(k)) return false; seen.add(k); return true; });
+  for (const p of Object.values(picks)) if (!routes.includes(p)) routes.push(p);
+  return { routes, picks, count: routes.length };
+}
+
+/* ---------- bus / songthaew routes near both ends (OpenStreetMap, standalone only) ---------- */
+const busMem = {};
+const BUSQ = (p, r) => `(node(around:${r},${p.lat},${p.lng})["highway"="bus_stop"];node(around:${r},${p.lat},${p.lng})["public_transport"="platform"]["bus"="yes"];)->.s;rel(bn.s)["route"~"^(bus|share_taxi|minibus|trolleybus)$"];out tags;`;
+function busFor(a, b) {
+  const key = [a.lat, a.lng, b.lat, b.lng].map(x => x.toFixed(4)).join();
+  if (!busMem[key]) busMem[key] = (async () => {
+    const [ja, jb] = await Promise.all([overpass('[out:json][timeout:25];' + BUSQ(a, 450)), overpass('[out:json][timeout:25];' + BUSQ(b, 450))]);
+    if (!ja || !jb) return null;
+    const A = new Map(ja.elements.map(e => [e.id, e])), res = jb.elements.filter(e => A.has(e.id));
+    const fmtR = e => { const t = e.tags, share = /share_taxi|minibus/.test(t.route); return `${share ? 'สองแถว/รถตู้' : 'รถเมล์'} สาย <b>${esc(t.ref || t.name || '?')}</b>${t.from || t.to ? ` (${esc(t.from || '')} → ${esc(t.to || '')})` : ''}`; };
+    const uniq = arr => [...new Set(arr.map(fmtR))].slice(0, 8);
+    return { direct: uniq(res), nearA: uniq(ja.elements), nearB: uniq(jb.elements) };
+  })();
+  return busMem[key];
+}
+function fillBus() {
+  document.querySelectorAll('.busbox[data-k]').forEach(el => {
+    if (el.dataset.done) return; el.dataset.done = '1';
+    const [a1, a2, b1, b2] = el.dataset.k.split(',').map(Number);
+    busFor({ lat: a1, lng: a2 }, { lat: b1, lng: b2 }).then(r => {
+      if (!r) { el.innerHTML = '<small>โหลดข้อมูลรถเมล์/สองแถวจาก OpenStreetMap ไม่สำเร็จ ใช้ปุ่ม Google Maps แทน</small>'; return; }
+      if (r.direct.length) el.innerHTML = '<b>สายที่ผ่านทั้งสองจุด (OpenStreetMap):</b><ul>' + r.direct.map(x => `<li>${x}</li>`).join('') + '</ul><small>ข้อมูลอาสาสมัคร อาจไม่ครบ ตรวจกับป้ายหรือแอปรถเมล์อีกครั้ง</small>';
+      else el.innerHTML = '<small>ไม่พบสายที่ผ่านทั้งสองจุดในข้อมูล OpenStreetMap' + (r.nearB.length ? '<br>สายที่ผ่านใกล้หมุด: ' + r.nearB.join(', ') : '') + ' · อาจต้องต่อรถหรือใช้วิน/แท็กซี่</small>';
+    });
+  });
+}
+function accessHTML(r, w) {
+  if (!r.acc) return '';
+  const A = r.acc[w]; if (!A.pt) return '';
+  const first = w === 'o', stP = A.st.place, stN = PLBY[stP], o = A.opt, km = A.st.km, link = first ? gmapDirLL(A.pt, placeLL(stP), 'transit') : gmapDirLL(placeLL(stP), A.pt, 'transit');
+  const notNear = A.st.nearest && A.st.place !== A.st.nearest.place, ex = exitInfo(stP, A.pt), mode = o.mode === 'walk' ? `เดิน ~${Math.round(o.min)} นาที` : `${o.label} ~${Math.round(o.min)} นาที (~฿${o.cost}, ประมาณการ)`;
+  const bus = o.mode !== 'walk' ? `<li><b>รถเมล์/สองแถว</b> <div class="busbox" ${ONLINE ? `data-k="${first ? [A.pt.lat, A.pt.lng, placeLL(stP).lat, placeLL(stP).lng] : [placeLL(stP).lat, placeLL(stP).lng, A.pt.lat, A.pt.lng]}">กำลังค้นหาสายรถเมล์/สองแถว…` : '"><small>ค้นหาสายรถเมล์/สองแถวไม่ได้ในหน้านี้ (ต้องต่ออินเทอร์เน็ต) ใช้ปุ่ม Google Maps ด้านล่าง หรือเปิดไฟล์เดี่ยว</small>'}</div></li>` : '';
+  if (first) return `<div class="xfer2 acc"><div class="xh">ออกจาก “${esc(A.pt.name)}” ไปขึ้นรถไฟฟ้าที่สถานี${esc(stN.th)}</div>
+    <div class="xflow"><div><small>เริ่มที่</small><b>${esc(A.pt.name)}</b><span>${A.pt.kind === 'gps' ? 'ตำแหน่งปัจจุบัน' : A.pt.kind === 'home' ? 'บ้าน' : 'จุดที่เลือก'}</span></div><i>➜</i><div class="to"><small>ขึ้นรถไฟฟ้าที่</small><b>สถานี${esc(stN.th)}</b><span>${esc(stN.codes.join(' · '))}</span></div></div>
+    <ol class="xsteps"><li><b>ไปสถานี</b> ระยะ ~${fmtKm(km)} · ${mode}${notNear ? ` <small>ไม่ใช่สถานีที่ใกล้ที่สุด (ใกล้สุดคือสถานี${esc(PLBY[A.st.nearest.place].th)} ${fmtKm(A.st.nearest.km)})</small>` : ' · สถานีที่ใกล้ที่สุด'}</li><li><b>เข้าสถานีทาง</b> <span class="xexit">${esc(ex.txt)}</span> <small>${esc(ex.sub)}</small></li>${bus}</ol>
+    ${ext(link, 'ดูเส้นทางไปสถานีใน Google Maps')}</div>`;
+  return `<div class="xfer2 acc dest"><div class="xh">ถึงสถานี${esc(stN.th)} → ไป “${esc(A.pt.name)}”</div>
+    <div class="xflow"><div><small>ลงรถไฟฟ้าที่</small><b>สถานี${esc(stN.th)}</b><span>${esc(stN.codes.join(' · '))}</span></div><i>➜</i><div class="to"><small>ออกจากสถานีทาง</small><b>${esc(ex.txt)}</b><span>${ex.ref ? 'เลขทางออก ' + esc(ex.ref) : 'ตามทิศของหมุด'}</span></div></div>
+    <ol class="xsteps"><li><b>ทางออก</b> <span class="xexit">${esc(ex.txt)}</span> <small>${esc(ex.sub)}</small></li><li><b>จากสถานีถึงหมุด</b> ระยะ ~${fmtKm(km)} · ${mode}${notNear ? ` <small>ไม่ใช่สถานีที่ใกล้หมุดที่สุด (ใกล้สุดคือสถานี${esc(PLBY[A.st.nearest.place].th)} ${fmtKm(A.st.nearest.km)})</small>` : ' · สถานีที่ใกล้หมุดที่สุด'}</li>${bus}</ol>
+    ${ext(link, 'ดูทางจากสถานีไปหมุดใน Google Maps')}</div>`;
+}
+function gmapDirLL(a, b, mode) { const q = p => encodeURIComponent(p.lat + ',' + p.lng); return `https://www.google.com/maps/dir/?api=1&origin=${q(a)}&destination=${q(b)}&travelmode=${mode}`; }
+
+/* ---------- pin + popup ---------- */
+let pinMk = null; st.dest = null;
+const pinIcon = L.divIcon({ className: 'dpin', html: '<span></span>', iconSize: [30, 40], iconAnchor: [15, 38], popupAnchor: [0, -34] });
+function popupEl() {
+  const d = st.dest, el = document.createElement('div'); el.className = 'pp';
+  el.innerHTML = `<b class="ppn">${esc(d.name)}</b><small class="ppc">${d.approx ? 'ตำแหน่งประมาณ · ' : ''}${d.lat.toFixed(5)}, ${d.lng.toFixed(5)}</small>
+    <div class="pph">ไปที่นี่ เลือกต้นทาง:</div>
+    <div class="ppb"><button type="button" data-o="gps">📍 ตำแหน่งปัจจุบัน</button><button type="button" data-o="home">🏠 ${home ? 'บ้าน: ' + esc(home.name) : 'บ้าน (ยังไม่ได้ตั้ง)'}</button></div>
+    <div class="ppst"><input type="text" placeholder="🚉 พิมพ์ชื่อสถานีต้นทาง" autocomplete="off" aria-label="สถานีต้นทาง"><ul hidden></ul></div>
+    <div class="ppm"></div><div class="ppx"><button type="button" data-a="sethome">ตั้งจุดนี้เป็นบ้าน</button><button type="button" data-a="asfrom">ใช้จุดนี้เป็นต้นทาง</button></div>`;
+  const msg = t => { el.querySelector('.ppm').textContent = t; };
+  const inp = el.querySelector('input'), ul = el.querySelector('ul');
+  inp.addEventListener('input', () => { const r = findPlaces(inp.value); ul.innerHTML = r.map(p => `<li data-id="${p.id}">${dots(p)}<span>${esc(p.th)}</span><span class="code">${esc(p.codes.join(' · '))}</span></li>`).join(''); ul.hidden = !r.length; });
+  ul.addEventListener('click', e => { const li = e.target.closest('li'); if (li) setOrigin({ place: li.dataset.id }); });
+  el.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.o === 'gps') {
+      if (!navigator.geolocation) return msg('เบราว์เซอร์นี้อ่านตำแหน่งปัจจุบันไม่ได้');
+      msg('กำลังอ่านตำแหน่งปัจจุบัน…');
+      navigator.geolocation.getCurrentPosition(p => setOrigin({ pt: { kind: 'gps', name: 'ตำแหน่งปัจจุบัน', lat: p.coords.latitude, lng: p.coords.longitude } }), () => msg('อ่านตำแหน่งไม่ได้ ตรวจว่าอนุญาตตำแหน่งให้เบราว์เซอร์แล้ว หรือเลือกสถานี/บ้านแทน'), { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 });
+    } else if (b.dataset.o === 'home') {
+      if (!home) return msg('ยังไม่ได้ตั้งบ้าน: ปักหมุดที่บ้านแล้วกด "ตั้งจุดนี้เป็นบ้าน"');
+      setOrigin({ pt: { kind: 'home', name: home.name, lat: home.lat, lng: home.lng } });
+    } else if (b.dataset.a === 'sethome') {
+      home = { name: d.name.length > 28 ? d.name.slice(0, 28) + '…' : d.name, lat: d.lat, lng: d.lng }; try { localStorage.setItem(HOME_KEY, JSON.stringify(home)); } catch (x) {}
+      msg('บันทึกเป็นบ้านแล้ว'); el.querySelector('[data-o=home]').textContent = '🏠 บ้าน: ' + home.name;
+    } else if (b.dataset.a === 'asfrom') { setOrigin({ pt: { kind: 'point', name: d.name, lat: d.lat, lng: d.lng }, swap: true }); }
+  });
+  L.DomEvent.disableClickPropagation(el); L.DomEvent.disableScrollPropagation(el);
+  return el;
+}
+function setOrigin(o) {
+  const d = st.dest; if (!d) return;
+  map.closePopup();
+  if (o.swap) { // use the pin as the start; destination must be chosen next
+    st.fromPt = o.pt; st.from = null; syncInputs(); $('to').focus(); setPane('plan'); return;
+  }
+  if (o.place) { st.from = o.place; st.fromPt = null; } else { st.from = null; st.fromPt = o.pt; }
+  if (d.place) { st.to = d.place; st.toPt = null; } else { st.to = null; st.toPt = d; }
+  syncInputs(); go();
+  if (matchMedia('(max-width:899px)').matches) setPane('plan');
+}
+function showPin() { if (!st.dest) return; pinMk.setLatLng([st.dest.lat, st.dest.lng]).bindPopup(popupEl, { className: 'ppwrap', minWidth: 230, maxWidth: 300, autoPanPaddingTopLeft: [10, 90] }).openPopup(); }
+function dropPin(lat, lng, name, place, approx) {
+  if (sim && sim.on) return;
+  st.dest = { name: name || 'หมุดที่ปักไว้', lat, lng, place: place || null, approx: !!approx };
+  if (!pinMk) pinMk = L.marker([lat, lng], { icon: pinIcon, keyboard: false, zIndexOffset: 900 }).addTo(map);
+  showPin();
+  if (!name && ONLINE) reverseName(lat, lng).then(n => { if (n && st.dest && st.dest.lat === lat && st.dest.lng === lng) { st.dest.name = n; pinMk.getPopup() && pinMk.getPopup().setContent(popupEl()); } });
+  else if (!name) st.dest.name = 'หมุดที่ปักไว้ (ตำแหน่งบนแผนที่)';
+}
+async function reverseName(lat, lng) {
+  try { const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&accept-language=th&lat=${lat}&lon=${lng}`); const j = await r.json(); return j.name || (j.display_name || '').split(',').slice(0, 2).join(' ').trim() || null; } catch (e) { return null; }
+}
+
+/* ---------- search island ---------- */
+const qEl = $('q'), qList = $('qlist'); let qTimer = 0, qSeq = 0, qItems = [], qSel = 0;
+function drawQ() {
+  qList.innerHTML = qItems.map((it, i) => `<li role="option" data-i="${i}" aria-selected="${i === qSel}"><span class="ic">${it.t === 'st' ? '🚉' : it.t === 'poi' ? '📍' : '🔎'}</span><span class="nm">${esc(it.name)}<small>${esc(it.sub || '')}</small></span></li>`).join('');
+  qList.hidden = !qItems.length; $('qx').hidden = !qEl.value;
+}
+function localQ(q) {
+  const k = q.toLowerCase().replace(/\s/g, ''), out = [];
+  for (const p of findPlaces(q).slice(0, 3)) out.push({ t: 'st', name: 'สถานี' + p.th, sub: p.codes.join(' · ') + ' · ' + p.lines.map(l => LINES[l].short).join(', '), place: p.id, ...placeLL(p.id) });
+  for (const p of POI_N) if (p.k.includes(k)) { out.push({ t: 'poi', name: p.th, sub: p.en + ' · ตำแหน่งประมาณ', lat: p.lat, lng: p.lng, approx: true }); if (out.length >= 7) break; }
+  return out;
+}
+async function onlineQ(q, seq) {
+  if (!ONLINE || q.length < 2) return;
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&countrycodes=th&accept-language=th&viewbox=100.25,14.10,100.90,13.45&q=${encodeURIComponent(q)}`);
+    const j = await r.json(); if (seq !== qSeq) return;
+    const add = j.map(x => ({ t: 'web', name: x.name || (x.display_name || '').split(',')[0], sub: (x.display_name || '').split(',').slice(1, 4).join(',').trim(), lat: +x.lat, lng: +x.lon }));
+    qItems = qItems.filter(x => x.t !== 'web').concat(add).slice(0, 10); drawQ();
+  } catch (e) { /* offline: local results only */ }
+}
+qEl.addEventListener('input', () => {
+  const q = qEl.value.trim(); clearTimeout(qTimer); qSel = 0; const seq = ++qSeq;
+  if (!q) { qItems = []; drawQ(); return; }
+  qItems = localQ(q); drawQ(); qTimer = setTimeout(() => onlineQ(q, seq), 420);
+});
+function pickQ(it) {
+  qEl.value = it.name; qItems = []; drawQ(); qEl.blur();
+  map.setView([it.lat, it.lng], Math.max(map.getZoom(), 16), { animate: true });
+  dropPin(it.lat, it.lng, it.name, it.place || null, it.approx);
+}
+qEl.addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); qSel = (qSel + (e.key === 'ArrowDown' ? 1 : qItems.length - 1)) % Math.max(qItems.length, 1); drawQ(); }
+  else if (e.key === 'Enter' && qItems.length) { e.preventDefault(); pickQ(qItems[qSel]); }
+  else if (e.key === 'Escape') { qItems = []; drawQ(); }
+});
+qList.addEventListener('pointerdown', e => { const li = e.target.closest('li'); if (li) { e.preventDefault(); pickQ(qItems[+li.dataset.i]); } });
+qEl.addEventListener('blur', () => setTimeout(() => { qItems = []; drawQ(); }, 150));
+$('qx').onclick = () => { qEl.value = ''; qItems = []; drawQ(); qEl.focus(); };
+L.DomEvent.disableClickPropagation($('island')); L.DomEvent.disableScrollPropagation($('island'));
+
+/* ---------- live clock: recompute every minute while "now" is on ---------- */
+let lastMin = -1;
+setInterval(() => {
+  if (!st.live || document.hidden || (typeof sim !== 'undefined' && sim.on)) return;
+  const m = Math.floor(nowMinute()); if (m === lastMin) return; lastMin = m;
+  if (document.activeElement !== $('time')) setDefaultTime();
+  if (st.plan && hasEnds()) go({ keep: true });
+}, 5000);
+if (ONLINE) loadExits();
+/* example state: Mo Chit to Suvarnabhumi, departing now */
+setDefaultTime(); syncLive();
 st.from = 'P_N8'; st.to = 'P_A1'; pf.set(st.from); pt.set(st.to);
 go();
 if (matchMedia('(max-width:899px)').matches) setPane('plan');
