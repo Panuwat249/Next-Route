@@ -1345,8 +1345,8 @@ const STYLES = { // Esri tile services (these load without a referrer, unlike OS
   night: ['กลางคืน', [T('Canvas/World_Dark_Gray_Base'), GREF], 16, CR],
   sat: ['ภาพถ่ายดาวเทียม', [T('World_Imagery'), ROADS], 19, 'Imagery © Esri, Maxar, Earthstar Geographics'],
 };
-let tstyle = 'night'; try { tstyle = localStorage.getItem('rail-tiles4') || 'night'; } catch (e) {}
-if (tstyle !== 'auto' && !STYLES[tstyle]) tstyle = 'night';
+let tstyle = 'auto'; try { tstyle = localStorage.getItem('rail-tiles5') || 'auto'; } catch (e) {} // new key: everyone starts on "ตามธีม"
+if (tstyle !== 'auto' && !STYLES[tstyle]) tstyle = 'auto';
 const isDark = () => { const t = document.documentElement.dataset.theme; return t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; };
 const tileKey = () => tstyle !== 'auto' ? tstyle : (isDark() ? 'dark' : 'light');
 let tileGrp = null, tilesKey = null, tOk = 0, tErr = 0;
@@ -1366,7 +1366,7 @@ if (TILES) {
   $('mapstyle').hidden = false; $('attr').hidden = false;
   $('mapstyle').innerHTML = '<option value="auto">ตามธีม</option>' + Object.entries(STYLES).map(([k, s]) => `<option value="${k}">${s[0]}</option>`).join('');
   $('mapstyle').value = tstyle;
-  $('mapstyle').onchange = e => { tstyle = e.target.value; try { localStorage.setItem('rail-tiles4', tstyle); } catch (x) {} draw(); };
+  $('mapstyle').onchange = e => { tstyle = e.target.value; try { localStorage.setItem('rail-tiles5', tstyle); } catch (x) {} draw(); };
 }
 
 const TH = [10.6, 12.3, 13.6];
