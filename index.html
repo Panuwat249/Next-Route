@@ -932,10 +932,15 @@ button{cursor:pointer}
 .rdl span{position:absolute;left:0;top:0;white-space:nowrap;font:500 10.5px var(--body);color:#5b6773;text-shadow:0 0 2px #fff,0 0 2px #fff,0 0 3px #fff,0 0 3px #fff;pointer-events:none}
 .card.empty{padding:12px 14px}
 
-.leaflet-layer.base-night{filter:sepia(1) hue-rotate(188deg) saturate(2.6) brightness(.95)}
-.leaflet-layer.base-light{filter:saturate(1.15) contrast(1.05)}
+.leaflet-layer.fb-night{filter:sepia(1) hue-rotate(188deg) saturate(2.6) brightness(.95)}
+.leaflet-layer.fb-light{filter:saturate(1.15) contrast(1.05)}
 #map[data-base="dark"] .rdl span{color:#b9c1cd;text-shadow:0 0 2px #1c2128,0 0 2px #1c2128,0 0 3px #1c2128,0 0 3px #1c2128}
 #map[data-base="night"] .rdl span{color:#9db6d8;text-shadow:0 0 2px #0f1a2b,0 0 2px #0f1a2b,0 0 3px #0f1a2b,0 0 3px #0f1a2b}
+
+/* detailed OSM / CARTO tiles */
+.leaflet-layer.osm-light{filter:saturate(1.2) contrast(1.03)}
+.leaflet-layer.osm-dark{filter:contrast(1.08) brightness(1.08)}
+.leaflet-layer.osm-night{filter:sepia(1) hue-rotate(188deg) saturate(2.6) brightness(1.05)}
 
 </style>
 <div class="app">
@@ -1339,7 +1344,37 @@ const T = n => ESRI + n + '/MapServer/tile/{z}/{y}/{x}';
 const ROADS = [T('Reference/World_Transportation'), 18, .8]; // road + soi lines and names drawn over the base map
 const CR = 'Esri, HERE, Garmin, © OpenStreetMap contributors';
 const GREF = [T('Canvas/World_Dark_Gray_Reference'), 16, .85, 'reflab'];
-const STYLES = { // Esri tile services (these load without a referrer, unlike OSM/CARTO); street and soi lines are drawn on top from OpenStreetMap (roads.js)
+/* Detailed basemaps come from OpenStreetMap-based tile servers, tried in order. Each one is tested at start-up with a real tile (a browser can show
+   the "access blocked" picture that OSM sends to pages without a Referer, so a plain image error is not enough). The first one that answers is used;
+   if none does, the Esri tiles below are used instead, with street and soi lines drawn on top from OpenStreetMap data (roads.js). */
+/* 1st choice: OpenFreeMap (free, no key, no Referer needed). Vector tiles drawn by MapLibre GL, loaded from a CDN at run time; styles: liberty / dark / fiord. */
+const ML = { js: ['https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js', 'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js'],
+  plugin: ['https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.1.3/leaflet-maplibre-gl.js', 'https://cdn.jsdelivr.net/npm/@maplibre/maplibre-gl-leaflet@0.1.3/leaflet-maplibre-gl.js'],
+  css: ['https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css', 'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css'] };
+const loadScript = async urls => { for (const u of urls) { const ok = await new Promise(res => { const e = document.createElement('script'); e.src = u; e.onload = () => res(true); e.onerror = () => { e.remove(); res(false); }; document.head.appendChild(e); }); if (ok) return true; } return false; };
+const loadCss = urls => { const e = document.createElement('link'); e.rel = 'stylesheet'; e.href = urls[0]; e.onerror = () => { e.href = urls[1]; }; document.head.appendChild(e); };
+let mlP = null;
+const loadML = () => mlP || (mlP = (async () => { if (!(window.maplibregl || await loadScript(ML.js))) return false; loadCss(ML.css); return !!(L.maplibreGL || await loadScript(ML.plugin)) && !!L.maplibreGL; })().catch(() => false));
+const SRC = {
+  ofm: { name: 'OpenFreeMap', ml: true, probe: 'https://tiles.openfreemap.org/styles/liberty', strict: true, cr: 'OpenFreeMap © OpenMapTiles · ข้อมูลจาก OpenStreetMap' },
+  osm: { name: 'OpenStreetMap', u: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', probe: 'https://tile.openstreetmap.org/12/3191/1890.png', strict: true, sub: 'abc', cr: '© OpenStreetMap contributors' },
+  osmfr: { name: 'OpenStreetMap France', u: 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', probe: 'https://a.tile.openstreetmap.fr/osmfr/12/3191/1890.png', strict: false, sub: 'abc', cr: '© OpenStreetMap contributors, tiles OSM France' },
+  carto: { name: 'CARTO Dark Matter', u: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', probe: 'https://a.basemaps.cartocdn.com/dark_all/12/3191/1890.png', strict: true, sub: 'abcd', cr: '© OpenStreetMap contributors © CARTO' },
+};
+const NET = { light: ['สว่าง', ['ofm', 'osm', 'osmfr']], dark: ['มืด', ['ofm', 'carto']], night: ['กลางคืน', ['ofm', 'carto']] };
+const OFM_STYLE = { light: 'liberty', dark: 'dark', night: 'fiord' };
+const srcOk = {}; let probed = !TILES;
+function probeSrc(g) {
+  const c = SRC[g];
+  return new Promise(res => {
+    let done = false; const fin = v => { if (!done) { done = true; srcOk[g] = v; res(v); } };
+    setTimeout(() => fin(false), c.ml ? 9000 : 3500);
+    if (c.ml) { Promise.all([fetch(c.probe, { cache: 'no-store' }).then(r => r.ok).catch(() => false), loadML()]).then(([a, b]) => fin(a && b)); return; }
+    fetch(c.probe, { cache: 'no-store' }).then(r => fin(r.ok)).catch(() => { if (c.strict) return fin(false); const im = new Image(); im.onload = () => fin(true); im.onerror = () => fin(false); im.src = c.probe; });
+  });
+}
+const netOf = key => { const n = NET[key], g = n && n[1].find(x => srcOk[x]); return g ? [n[0], [SRC[g].u], 19, SRC[g].cr, g, SRC[g].sub, SRC[g].ml ? 'https://tiles.openfreemap.org/styles/' + OFM_STYLE[key] : null] : null; };
+const STYLES = { // Esri tile services (these load without a referrer, unlike OSM/CARTO)
   light: ['สว่าง', [T('World_Topo_Map')], 18, CR],
   dark: ['มืด', [T('Canvas/World_Dark_Gray_Base'), GREF], 16, CR],
   night: ['กลางคืน', [T('Canvas/World_Dark_Gray_Base'), GREF], 16, CR],
@@ -1349,16 +1384,23 @@ let tstyle = 'auto'; try { tstyle = localStorage.getItem('rail-tiles5') || 'auto
 if (tstyle !== 'auto' && !STYLES[tstyle]) tstyle = 'auto';
 const isDark = () => { const t = document.documentElement.dataset.theme; return t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; };
 const tileKey = () => tstyle !== 'auto' ? tstyle : (isDark() ? 'dark' : 'light');
+const styleOf = key => netOf(key) || STYLES[key];
 let tileGrp = null, tilesKey = null, tOk = 0, tErr = 0;
 function applyTiles() {
-  if (!TILES) return;
-  const key = tileKey(); if (key === tilesKey) return;
-  tilesKey = key; tOk = tErr = 0; if (tileGrp) tileGrp.remove();
-  const S = STYLES[key]; $('attr').innerHTML = 'Leaflet | ' + esc(S[3]);
+  if (!TILES || !probed) return;
+  const key = tileKey(), kk = key + '+' + ((netOf(key) || [])[4] || 'esri'); if (kk === tilesKey) return;
+  tilesKey = kk; tOk = tErr = 0; if (tileGrp) tileGrp.remove();
+  const S = styleOf(key), osm = !!S[4]; $('attr').innerHTML = 'Leaflet | ' + esc(S[3]) + (osm ? '' : ' · แผนที่สำรอง');
+  if (S[6]) { // vector basemap (OpenFreeMap through MapLibre GL); drop back to the next source if it never finishes loading
+    const gl = L.maplibreGL({ style: S[6], attribution: '' }); tileGrp = L.layerGroup([gl]).addTo(map);
+    let ready = false; const bad = () => { if (!ready && tilesKey === kk) { srcOk.ofm = false; draw(); } };
+    try { const m = gl.getMaplibreMap(); m.on('load', () => { ready = true; }); m.on('error', e => { if (!ready && e && e.error && /style|404|Failed/i.test(String(e.error.message || e.error))) bad(); }); } catch (e) { bad(); }
+    setTimeout(bad, 10000); return;
+  }
   tileGrp = L.layerGroup(S[1].map((u, i) => {
     const [url, nz, op, pane] = Array.isArray(u) ? u : [u, S[2]];
-    const t = L.tileLayer(url, { maxNativeZoom: nz, maxZoom: 19, minZoom: 9, opacity: op || 1, ...(pane ? { pane } : {}), zIndex: i + 1, keepBuffer: 3, updateWhenIdle: false, className: i === 0 ? 'base-' + key : '' });
-    t.on('tileload', () => { tOk++; }); t.on('tileerror', () => { if (++tErr > 8 && !tOk) $('attr').textContent = 'โหลดภาพแผนที่ไม่สำเร็จ ตรวจการเชื่อมต่ออินเทอร์เน็ต หรือเลือกรูปแบบอื่น'; });
+    const t = L.tileLayer(url, { maxNativeZoom: nz, maxZoom: 19, minZoom: 9, opacity: op || 1, ...(pane ? { pane } : {}), zIndex: i + 1, keepBuffer: 3, updateWhenIdle: false, subdomains: S[5] || 'abc', className: i === 0 ? (osm ? 'osm-' : 'fb-') + key : '' });
+    t.on('tileload', () => { tOk++; }); t.on('tileerror', () => { if (osm && !tOk && ++tErr > 5) { srcOk[S[4]] = false; draw(); return; } if (++tErr > 8 && !tOk) $('attr').textContent = 'โหลดภาพแผนที่ไม่สำเร็จ ตรวจการเชื่อมต่ออินเทอร์เน็ต หรือเลือกรูปแบบอื่น'; });
     return t;
   })).addTo(map);
 }
@@ -1367,6 +1409,12 @@ if (TILES) {
   $('mapstyle').innerHTML = '<option value="auto">ตามธีม</option>' + Object.entries(STYLES).map(([k, s]) => `<option value="${k}">${s[0]}</option>`).join('');
   $('mapstyle').value = tstyle;
   $('mapstyle').onchange = e => { tstyle = e.target.value; try { localStorage.setItem('rail-tiles5', tstyle); } catch (x) {} draw(); };
+}
+
+if (TILES) { // start as soon as the probes are in (or after 3.8 s); a better source that answers later takes over
+  const ps = Object.keys(SRC).map(probeSrc); let n = 0;
+  ps.forEach(p => p.then(() => { if (++n === ps.length) probed = true; if (probed) draw(); }));
+  setTimeout(() => { probed = true; draw(); }, 3800);
 }
 
 const TH = [10.6, 12.3, 13.6];
@@ -2228,7 +2276,7 @@ function rdLabels(force) {
   }
 }
 function roadsSync() {
-  const key = tileKey(), want = TILES && !!RD_PAL[key] && map.getZoom() >= 15;
+  const key = tileKey(), want = TILES && probed && !netOf(key) && !!RD_PAL[key] && map.getZoom() >= 15;
   if (want !== RD.on) { RD.on = want; want ? (RD.grp.addTo(map), RD.labs.addTo(map)) : (RD.grp.remove(), RD.labs.remove()); }
   if (!want) return;
   map.getContainer().dataset.base = key;
@@ -2242,5 +2290,6 @@ setDefaultTime(); syncLive(); $('results').innerHTML = EMPTY;
 if (matchMedia('(max-width:899px)').matches) setPane('plan');
 
 </script>
-</body>
-</html>
+
+
+</body></html>
