@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>[hidden]{display:none!important}body{margin:0}html{color-scheme:light}</style></head><body>
-<title>Next Route</title>
+<title>แผนเดินทางรถไฟฟ้า</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -932,12 +932,17 @@ button{cursor:pointer}
 .rdl span{position:absolute;left:0;top:0;white-space:nowrap;font:500 10.5px var(--body);color:#5b6773;text-shadow:0 0 2px #fff,0 0 2px #fff,0 0 3px #fff,0 0 3px #fff;pointer-events:none}
 .card.empty{padding:12px 14px}
 
+.leaflet-layer.base-night{filter:sepia(1) hue-rotate(188deg) saturate(2.6) brightness(.95)}
+.leaflet-layer.base-light{filter:saturate(1.15) contrast(1.05)}
+#map[data-base="dark"] .rdl span{color:#b9c1cd;text-shadow:0 0 2px #1c2128,0 0 2px #1c2128,0 0 3px #1c2128,0 0 3px #1c2128}
+#map[data-base="night"] .rdl span{color:#9db6d8;text-shadow:0 0 2px #0f1a2b,0 0 2px #0f1a2b,0 0 3px #0f1a2b,0 0 3px #0f1a2b}
+
 </style>
 <div class="app">
   <header class="top gut">
     <div class="brand">
       <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="var(--ink)"/><path d="M5 22 L13 22 L19 10 L27 10" fill="none" stroke="#92D04E" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10 L12 10 L20 22 L27 22" fill="none" stroke="#F06BA6" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="16" r="3.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.5"/></svg>
-      <div><h1>Next Route</h1><small>BTS · MRT · ARL · SRT · สายสีทอง</small></div>
+      <div><h1>แผนเดินทางรถไฟฟ้า</h1><small>BTS · MRT · ARL · SRT · สายสีทอง</small></div>
     </div>
     <button class="btn" id="theme" type="button">ธีม: อัตโนมัติ</button>
   </header>
@@ -1290,7 +1295,7 @@ const GEOM = {}; // per hop: intermediate [lat,lng] points that follow the real 
 for (const [k, pts] of Object.entries(DATA.geom || {})) { GEOM[k] = pts; const [a, b] = k.split('|'); GEOM[b + '|' + a] = pts.slice().reverse(); }
 const map = L.map('map', { zoomControl: false, attributionControl: false, minZoom: 9, maxZoom: 19, zoomSnap: .25, zoomDelta: .5, wheelPxPerZoomLevel: 100, worldCopyJump: false });
 map.setView([13.77, 100.56], 11);
-[['osmroads', 205], ['reflab', 207], ['lines', 410], ['route', 420], ['wave', 425], ['dots', 430], ['hits', 440], ['labels', 450]].forEach(([n, z]) => { map.createPane(n).style.zIndex = z; });
+[['osmroads', 205], ['osmroads2', 206], ['reflab', 207], ['lines', 410], ['route', 420], ['wave', 425], ['dots', 430], ['hits', 440], ['labels', 450]].forEach(([n, z]) => { map.createPane(n).style.zIndex = z; });
 map.getPane('labels').style.pointerEvents = 'none'; map.getPane('reflab').style.pointerEvents = 'none';
 const ll = id => [NODES[id].lat, NODES[id].lng];
 function trackLL(ids) { // station → real track vertices → station
@@ -1333,18 +1338,17 @@ const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services/';
 const T = n => ESRI + n + '/MapServer/tile/{z}/{y}/{x}';
 const ROADS = [T('Reference/World_Transportation'), 18, .8]; // road + soi lines and names drawn over the base map
 const CR = 'Esri, HERE, Garmin, © OpenStreetMap contributors';
-const STYLES = { // Esri tile services (these load without a referrer, unlike OSM/CARTO)
-  soi: ['แผนที่ซอย (สไตล์ Google Maps)', [T('Canvas/World_Light_Gray_Base'), [T('Canvas/World_Light_Gray_Reference'), 16, .85, 'reflab']], 16, CR],
-  gray: ['แผนที่เรียบ สว่าง', [T('Canvas/World_Light_Gray_Base'), T('Canvas/World_Light_Gray_Reference')], 16, CR],
-  darkgray: ['แผนที่เรียบ มืด', [T('Canvas/World_Dark_Gray_Base'), T('Canvas/World_Dark_Gray_Reference')], 16, CR],
-  street: ['แผนที่ถนน (คล้าย Google Maps)', [T('World_Street_Map')], 19, CR],
-  topo: ['แผนที่ภูมิประเทศ + ถนน/ซอย', [T('World_Topo_Map'), ROADS], 19, CR],
-  sat: ['ภาพถ่ายดาวเทียม + ชื่อถนน', [T('World_Imagery'), ROADS], 19, 'Imagery © Esri, Maxar, Earthstar Geographics'],
+const GREF = [T('Canvas/World_Dark_Gray_Reference'), 16, .85, 'reflab'];
+const STYLES = { // Esri tile services (these load without a referrer, unlike OSM/CARTO); street and soi lines are drawn on top from OpenStreetMap (roads.js)
+  light: ['สว่าง', [T('World_Topo_Map')], 18, CR],
+  dark: ['มืด', [T('Canvas/World_Dark_Gray_Base'), GREF], 16, CR],
+  night: ['กลางคืน', [T('Canvas/World_Dark_Gray_Base'), GREF], 16, CR],
+  sat: ['ภาพถ่ายดาวเทียม', [T('World_Imagery'), ROADS], 19, 'Imagery © Esri, Maxar, Earthstar Geographics'],
 };
-let tstyle = 'soi'; try { tstyle = localStorage.getItem('rail-tiles3') || 'soi'; } catch (e) {}
-if (tstyle !== 'auto' && !STYLES[tstyle]) tstyle = 'soi';
+let tstyle = 'night'; try { tstyle = localStorage.getItem('rail-tiles4') || 'night'; } catch (e) {}
+if (tstyle !== 'auto' && !STYLES[tstyle]) tstyle = 'night';
 const isDark = () => { const t = document.documentElement.dataset.theme; return t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; };
-const tileKey = () => tstyle !== 'auto' ? tstyle : (isDark() ? 'darkgray' : 'gray');
+const tileKey = () => tstyle !== 'auto' ? tstyle : (isDark() ? 'dark' : 'light');
 let tileGrp = null, tilesKey = null, tOk = 0, tErr = 0;
 function applyTiles() {
   if (!TILES) return;
@@ -1360,9 +1364,9 @@ function applyTiles() {
 }
 if (TILES) {
   $('mapstyle').hidden = false; $('attr').hidden = false;
-  $('mapstyle').innerHTML = '<option value="auto">แผนที่: ตามธีม</option>' + Object.entries(STYLES).map(([k, s]) => `<option value="${k}">${s[0]}</option>`).join('');
+  $('mapstyle').innerHTML = '<option value="auto">ตามธีม</option>' + Object.entries(STYLES).map(([k, s]) => `<option value="${k}">${s[0]}</option>`).join('');
   $('mapstyle').value = tstyle;
-  $('mapstyle').onchange = e => { tstyle = e.target.value; try { localStorage.setItem('rail-tiles3', tstyle); } catch (x) {} draw(); };
+  $('mapstyle').onchange = e => { tstyle = e.target.value; try { localStorage.setItem('rail-tiles4', tstyle); } catch (x) {} draw(); };
 }
 
 const TH = [10.6, 12.3, 13.6];
@@ -1761,10 +1765,10 @@ const POIS = [ // well-known places, approximate positions (used when the online
 const POI_N = POIS.map(p => ({ th: p[0], en: p[1], lat: p[2], lng: p[3], k: (p[0] + ' ' + p[1]).toLowerCase().replace(/\s/g, '') }));
 const HOME_KEY = 'rail-home';
 let home = null; try { home = JSON.parse(localStorage.getItem(HOME_KEY) || 'null'); } catch (e) {}
-const OVP = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
+const OVP = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
 async function overpass(q) {
-  for (const h of OVP) { try { const r = await fetch(h, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }); if (r.ok) return await r.json(); } catch (e) {} }
-  return null;
+  const one = async h => { const r = await fetch(h, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }); if (!r.ok) throw new Error(r.status); return r.json(); };
+  try { return await Promise.any(OVP.map(one)); } catch (e) { return null; } // ask every mirror at once, take the first answer
 }
 const placeLL = id => { const n = NODES[PLACES[id][0]]; return { lat: n.lat, lng: n.lng }; };
 const kmBetween = (a, b) => hav({ lat: a.lat, lng: a.lng }, { lat: b.lat, lng: b.lng });
@@ -1964,7 +1968,13 @@ async function busTry(a, b, rad) {
 }
 function busFor(a, b) {
   const key = [a.lat, a.lng, b.lat, b.lng].map(x => x.toFixed(4)).join();
-  if (!busMem[key]) busMem[key] = (async () => { let r = await busTry(a, b, 600); if (r && !r.direct.length) { const r2 = await busTry(a, b, 1500); if (r2 && (r2.direct.length || r2.nearA.length > r.nearA.length)) r = r2; } return r; })();
+  if (!busMem[key]) busMem[key] = (async () => { // remembered for 14 days, so a place looked up once answers at once next time
+    const ck = 'rail-bus-' + key; try { const c = JSON.parse(localStorage.getItem(ck) || 'null'); if (c && Date.now() - c.t < 14 * 864e5) return c.d; } catch (e) {}
+    const [r1, r2] = await Promise.all([busTry(a, b, 600), busTry(a, b, 1500)]); let r = r1 || r2;
+    if (r1 && !r1.direct.length && r2 && (r2.direct.length || r2.nearA.length > r1.nearA.length)) r = r2;
+    if (r) try { localStorage.setItem(ck, JSON.stringify({ t: Date.now(), d: r })); } catch (e) {}
+    return r;
+  })();
   return busMem[key];
 }
 function fillBus() {
@@ -1972,7 +1982,7 @@ function fillBus() {
     if (el.dataset.done) return; el.dataset.done = '1';
     const [a1, a2, b1, b2] = el.dataset.k.split(',').map(Number);
     busFor({ lat: a1, lng: a2 }, { lat: b1, lng: b2 }).then(r => {
-      if (!r) { el.innerHTML = '<small>โหลดข้อมูลรถเมล์/สองแถวจาก OpenStreetMap ไม่สำเร็จ ใช้ปุ่ม Google Maps แทน</small>'; return; }
+      if (!r) { el.innerHTML = '<small>โหลดข้อมูลรถเมล์/สองแถวจาก OpenStreetMap ไม่สำเร็จ (เซิร์ฟเวอร์ข้อมูลฟรีอาจแออัด) ลองเลือกเส้นทางใหม่อีกครั้ง หรือใช้ปุ่ม Google Maps แทน</small>'; return; }
       const stops = `<small>ป้ายใกล้ต้นทาง: ${esc(r.stopA || 'ไม่พบป้ายในข้อมูล')} · ป้ายใกล้ปลายทาง: ${esc(r.stopB || 'ไม่พบป้ายในข้อมูล')}</small>`;
       if (r.direct.length) el.innerHTML = `<b>สายที่ผ่านทั้งสองฝั่ง (ค้นในรัศมี ${r.rad} ม.):</b><ul>${r.direct.map(x => `<li>${x}</li>`).join('')}</ul>${stops}<small>ข้อมูลอาสาสมัคร OpenStreetMap อาจไม่ครบ ตรวจกับป้ายหรือแอปรถเมล์อีกครั้ง</small>`;
       else el.innerHTML = `<small>ไม่พบสายที่ผ่านทั้งสองฝั่งโดยตรงในข้อมูล OpenStreetMap — อาจต้องต่อรถ ใช้วินหรือแท็กซี่ แทน</small>${r.nearA.length ? `<small><b>สายใกล้ต้นทาง:</b></small><ul>${r.nearA.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}${r.nearB.length ? `<small><b>สายใกล้ปลายทาง:</b></small><ul>${r.nearB.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}${stops}`;
@@ -1990,7 +2000,7 @@ function accessHTML(r, w) {
   const mode = o.mode === 'walk' ? `เดิน ~${Math.round(o.min)} นาที` : `${o.label} ~${Math.round(o.min)} นาที (~฿${o.cost}, ประมาณการ)`;
   const far = km > 15 ? `<li class="farnote">จุดนี้อยู่ไกลจากรถไฟฟ้า (~${fmtKm(km)}) ใช้ได้เฉพาะช่วงจากจุดนี้ไปสถานี ส่วนรถไฟทางไกลจะเพิ่มในอนาคต</li>` : '';
   const kk = (first ? [A.pt.lat, A.pt.lng, ep.lat, ep.lng] : [ep.lat, ep.lng, A.pt.lat, A.pt.lng]).join(',');
-  const bus = o.mode !== 'walk' ? `<li><b>รถเมล์/สองแถว/รถตู้</b> <div class="busbox" ${ONLINE ? `data-k="${kk}">กำลังค้นหาสายรถจาก OpenStreetMap…` : '"><small>ค้นหาสายรถไม่ได้ในหน้านี้ (ต้องต่ออินเทอร์เน็ต) ใช้ปุ่ม Google Maps ด้านล่าง หรือเปิดไฟล์เดี่ยว</small>'}</div></li>` : '';
+  const bus = o.mode !== 'walk' ? `<li><b>รถเมล์/สองแถว/รถตู้</b> <div class="busbox" ${ONLINE ? `data-k="${kk}">กำลังค้นหาสายรถจาก OpenStreetMap… (ครั้งแรกอาจใช้ 5–20 วินาที ครั้งต่อไปเร็วขึ้น)` : '"><small>ค้นหาสายรถไม่ได้ในหน้านี้ (ต้องต่ออินเทอร์เน็ต) ใช้ปุ่ม Google Maps ด้านล่าง หรือเปิดไฟล์เดี่ยว</small>'}</div></li>` : '';
   const nn = notNear ? ` <small>ไม่ใช่สถานีที่ใกล้ที่สุด (ใกล้สุดคือสถานี${esc(PLBY[A.st.nearest.place].th)} ${fmtKm(A.st.nearest.km)})</small>` : ' · สถานีที่ใกล้ที่สุด';
   const src = A.pt.kind === 'gps' ? 'ตำแหน่งปัจจุบัน' : A.pt.kind === 'home' ? 'บ้าน' : 'จุดที่เลือก';
   if (first) return `<div class="xfer2 acc"><div class="xh">ออกจาก “${esc(A.pt.name)}” ไปขึ้นรถไฟฟ้าที่สถานี${esc(stN.th)}</div>
@@ -2162,19 +2172,25 @@ setInterval(() => {
 }, 5000);
 if (ONLINE) Promise.all([loadExits(), loadPois()]).then(() => { if (st.plan && st.sel) renderResults({ quiet: true }); });
 /* roads.js: Google-Maps-like street + soi lines drawn from OpenStreetMap (standalone file only, style "แผนที่ซอย"). */
-const RD = { Z: 15, grp: L.layerGroup(), labs: L.layerGroup(), on: false, tiles: new Map(), ids: new Set(), ways: [], busy: 0, z: null, lastLab: '' };
-RD.canvas = L.canvas({ pane: 'osmroads', padding: .4 });
-// [width in px at zoom 17, colour group]; fills copy the blue-grey roads of Google Maps
-const RD_W = { motorway: [15, 0], trunk: [14, 0], primary: [13, 0], secondary: [11, 0], tertiary: [9, 1], unclassified: [6.5, 1], residential: [6.5, 1], living_street: [5, 1], service: [3.6, 1], pedestrian: [3.6, 1] };
-const RD_COL = ['#aebfd1', '#c9d6e3'];
-const rdW = (b, z) => Math.max(1.3, b * Math.pow(2, z - 17));
+const RD = { Z: 15, grp: L.layerGroup(), labs: L.layerGroup(), on: false, key: null, tiles: new Map(), ids: new Set(), ways: [], z: null };
+RD.cv1 = L.canvas({ pane: 'osmroads', padding: .4 }); RD.cv2 = L.canvas({ pane: 'osmroads2', padding: .4 }); // casings under, fills over, so junctions look right
+// [width in px at zoom 17, colour group: 0 motorway/primary, 1 secondary, 2 minor streets, 3 service/footpaths]
+const RD_W = { motorway: [15, 0], trunk: [14, 0], primary: [13, 0], secondary: [11, 1], tertiary: [9, 2], unclassified: [6.5, 2], residential: [6.5, 2], living_street: [5, 2], service: [3.6, 3], pedestrian: [3.6, 3] };
+const RD_PAL = { // [fill, casing] per group, for each map style
+  light: [['#f9b872', '#d98f3f'], ['#fddc8f', '#e0b84f'], ['#ffffff', '#cfd3d9'], ['#ffffff', '#dfe2e6']],
+  dark: [['#58626f', '#2a3039'], ['#4c5561', '#2a3039'], ['#3d4550', '#2a3039'], ['#363d47', '#262b33']],
+  night: [['#3d5f8c', '#17263d'], ['#35547d', '#17263d'], ['#2b4468', '#17263d'], ['#243a58', '#15202f']],
+};
+const rdW = (b, z) => Math.max(1.3, b * Math.pow(2, z - 17)), rdC = w => w + (w > 2.6 ? 2.6 : 1.6);
+function rdStyle(w, key, z) { const p = RD_PAL[key][w.g]; w.c.setStyle({ color: p[1], weight: rdC(rdW(w.base, z)) }); w.l.setStyle({ color: p[0], weight: rdW(w.base, z) }); }
 function rdAdd(e) {
   if (!e.geometry || e.geometry.length < 2 || RD.ids.has(e.id)) return; RD.ids.add(e.id);
   const t = e.tags || {}, cls = (t.highway || '').replace('_link', ''), spec = RD_W[cls]; if (!spec) return;
-  const pts = e.geometry.map(g => [g.lat, g.lon]), link = /_link$/.test(t.highway || ''), base = spec[0] * (link ? .7 : 1);
-  const l = L.polyline(pts, { pane: 'osmroads', renderer: RD.canvas, interactive: false, color: RD_COL[spec[1]], weight: rdW(base, map.getZoom()), lineCap: 'round', lineJoin: 'round' });
-  RD.grp.addLayer(l);
-  const w = { l, base, pts, name: t['name:th'] || t.name || '', cls, len: 0 };
+  const pts = e.geometry.map(g => [g.lat, g.lon]), link = /_link$/.test(t.highway || ''), base = spec[0] * (link ? .7 : 1), key = RD.key || 'light', z = map.getZoom();
+  const o = { interactive: false, lineCap: 'round', lineJoin: 'round' };
+  const c = L.polyline(pts, { ...o, pane: 'osmroads', renderer: RD.cv1 }), l = L.polyline(pts, { ...o, pane: 'osmroads2', renderer: RD.cv2 });
+  const w = { c, l, base, g: spec[1], pts, name: t['name:th'] || t.name || '', cls, len: 0 }; rdStyle(w, key, z);
+  RD.grp.addLayer(c); RD.grp.addLayer(l);
   for (let i = 1; i < pts.length; i++) w.len += kmBetween({ lat: pts[i - 1][0], lng: pts[i - 1][1] }, { lat: pts[i][0], lng: pts[i][1] }) * 1000;
   RD.ways.push(w);
 }
@@ -2212,10 +2228,11 @@ function rdLabels(force) {
   }
 }
 function roadsSync() {
-  const want = TILES && tileKey() === 'soi' && map.getZoom() >= 15;
+  const key = tileKey(), want = TILES && !!RD_PAL[key] && map.getZoom() >= 15;
   if (want !== RD.on) { RD.on = want; want ? (RD.grp.addTo(map), RD.labs.addTo(map)) : (RD.grp.remove(), RD.labs.remove()); }
   if (!want) return;
-  const z = map.getZoom(); if (z !== RD.z) { RD.z = z; for (const w of RD.ways) w.l.setStyle({ weight: rdW(w.base, z) }); }
+  map.getContainer().dataset.base = key;
+  const z = map.getZoom(); if (z !== RD.z || key !== RD.key) { RD.z = z; RD.key = key; for (const w of RD.ways) rdStyle(w, key, z); }
   rdLoad(); rdLabels();
 }
 map.on('moveend zoomend', roadsSync);
@@ -2225,6 +2242,5 @@ setDefaultTime(); syncLive(); $('results').innerHTML = EMPTY;
 if (matchMedia('(max-width:899px)').matches) setPane('plan');
 
 </script>
-
-
-</body></html>
+</body>
+</html>
