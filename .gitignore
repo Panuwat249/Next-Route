@@ -1,0 +1,8 @@
+dist/
+node_modules/
+*.bak
+.DS_Store
+# raw GTFS feeds (hundreds of MB) are never committed; only the compact data/gtfs_data.js is
+gtfs-raw/
+*.7z
+*.zip
