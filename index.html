@@ -2971,7 +2971,7 @@ PROVS.split('\n').forEach(l => { const [n, la, ln, r] = l.split('|'); if (r[0] =
 function catProv(la, ln) { let b = '', bd = 1e9; const k = Math.cos(la * Math.PI / 180); for (const [, pla, pln, prov] of CATP) { const d = (pla - la) ** 2 + ((pln - ln) * k) ** 2; if (d < bd) { bd = d; b = prov; } } return b; }
 
 const CATK = [ // home tiles, in the order people look for them
-  ['rail', 'รถไฟฟ้า', '🚇', '#1d4ed8'], ['t', 'รถไฟทางไกล', '🚆', '#b22222'], ['b', 'รถเมล์', '🚌', '#e8590c'], ['f', 'เรือ', '⛴', '#0b7fb3'],
+  ['rail', 'รถไฟฟ้า', '🚇', '#1d4ed8'], ['t', 'รถไฟทางไกล (SRT)', '🚆', '#b22222'], ['b', 'รถเมล์', '🚌', '#e8590c'], ['f', 'เรือ', '⛴', '#0b7fb3'],
   ['v', 'รถตู้', '🚐', '#c2255c'], ['p', 'รถปริมณฑล', '🚍', '#7048e8'], ['s', 'สองแถว / รถในซอย', '🛻', '#2f9e44'], ['i', 'รถทัวร์ / ต่างจังหวัด', '🚌', '#495057']];
 const CATPAL = ['#1971c2', '#e8590c', '#2f9e44', '#c2255c', '#7048e8', '#0b7fb3', '#b08900', '#d6336c', '#0ca678', '#5c7cfa'];
 const CAT = { st: [], idx: null, inited: false };
@@ -3018,7 +3018,7 @@ function catGroups(k) {
   if (CAT.idx[k]) return CAT.idx[k];
   const groups = new Map(), add = (gid, gname, ri, sec) => { let g = groups.get(gid); if (!g) groups.set(gid, g = { id: gid, name: gname, cards: new Map(), n: 0 }); const r = TR.R[ri], lab = catLabel(r), key = lab + '|' + r.ag + '|' + (sec || ''); let c = g.cards.get(key); if (!c) { g.cards.set(key, c = { k, label: lab, ris: [], sec: sec || '', col: null }); } c.ris.push(ri); };
   if (k === 'rail') {
-    const SY = { BTS: 'BTS', MRT: 'MRT', ARL: 'แอร์พอร์ต เรล ลิงก์', SRT: 'รถไฟสายสีแดง (SRT)', 'สายสีทอง': 'สายสีทอง' };
+    const SY = { BTS: 'BTS', MRT: 'MRT', ARL: 'แอร์พอร์ต เรล ลิงก์', SRTET: 'รถไฟสายสีแดง (SRTET)', 'สายสีทอง': 'สายสีทอง' };
     for (const [lid, L] of Object.entries(LINES)) { const gid = L.sysname, g = groups.get(gid) || (groups.set(gid, { id: gid, name: SY[gid] || gid, cards: new Map(), n: 0 }), groups.get(gid)); g.cards.set(lid, { k, label: L.short, line: lid, ris: [], col: L.color, sec: '' }); }
   } else for (const ri of TR.byKind[k] || []) {
     const r = TR.R[ri];
@@ -3286,6 +3286,5 @@ if (TILES) { trInitUI(); catInit(); $('lyrkeysave').onclick = () => { const v = 
 else { $('lyrbtn').hidden = true; $('catbtn').hidden = true; $('modes').hidden = true; }
 
 </script>
-
-
-</body></html>
+</body>
+</html>
