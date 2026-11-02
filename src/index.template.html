@@ -1,0 +1,97 @@
+<title>Next Route</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/*CSS*/
+</style>
+<div class="app">
+  <header class="top gut">
+    <div class="brand">
+      <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="var(--ink)"/><path d="M5 22 L13 22 L19 10 L27 10" fill="none" stroke="#92D04E" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10 L12 10 L20 22 L27 22" fill="none" stroke="#F06BA6" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="16" r="3.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.5"/></svg>
+      <div><h1>Next Route</h1><small>BTS · MRT · ARL · SRT · สายสีทอง</small></div>
+    </div>
+    <button class="btn" id="theme" type="button">ธีม: อัตโนมัติ</button>
+  </header>
+
+  <div class="main" data-pane="plan">
+    <section class="rail gut" aria-label="วางแผนเดินทาง">
+      <form class="card planner" id="planner" autocomplete="off">
+        <div class="fieldrow">
+          <div class="fields">
+            <div class="field"><label for="from">ต้นทาง</label><input id="from" type="text" placeholder="ต้นทาง: สถานี ห้าง สถานที่ หรือปักหมุด" role="combobox" aria-expanded="false" aria-controls="fromList"><span class="mk" aria-hidden="true"></span><ul class="sugg" id="fromList" role="listbox" hidden></ul></div>
+            <div class="field dst"><label for="to">ปลายทาง</label><input id="to" type="text" placeholder="ปลายทาง: สถานี ห้าง สถานที่ หรือปักหมุด" role="combobox" aria-expanded="false" aria-controls="toList"><span class="mk" aria-hidden="true"></span><ul class="sugg" id="toList" role="listbox" hidden></ul></div>
+          </div>
+          <button class="btn swap" id="swap" type="button" aria-label="สลับต้นทางกับปลายทาง"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"/></svg></button>
+        </div>
+        <div class="opts">
+          <div><label for="time">เวลาออกเดินทาง</label><input id="time" type="time" value="09:00"></div>
+          <div><label for="day">วัน</label><select id="day"><option value="wd">จันทร์–ศุกร์</option><option value="we">เสาร์–อาทิตย์/วันหยุด</option></select></div>
+        </div>
+        <div class="modes" id="modes" role="group" aria-label="เลือกประเภทการเดินทาง"></div>
+        <div style="display:flex;gap:8px"><button class="btn primary" type="submit" style="flex:1">ค้นหาเส้นทาง</button><button class="btn" type="button" id="now" aria-pressed="true">● ตอนนี้ (สด)</button><button class="btn" type="button" id="clearall">ล้างค่า</button></div>
+        <p class="hint">“ตอนนี้ (สด)” กดอีกครั้งเพื่อปิด แล้วตั้งเวลาเองได้ · แตะบนแผนที่เพื่อปักหมุดปลายทาง</p>
+      </form>
+      <div id="results" aria-live="polite" style="display:grid;gap:12px"></div>
+      <details class="card notes">
+        <summary>ค่าโดยสาร ข้อมูลรถสด และข้อจำกัด</summary>
+        <ul>
+          <li>ค่าโดยสารเป็นราคาประมาณสำหรับผู้ใหญ่ ใช้บัตร EMV ตามอัตราที่ประกาศถึง ต.ค. 2569 ยังไม่รวมส่วนลดเด็ก นักเรียน และผู้สูงอายุ</li>
+          <li>นโยบาย 20 บาทตลอดสายถูกยกเลิกแล้ว (ครม. 23 มิ.ย. 2569) หลักการใหม่ คือเพดาน 45 บาทต่อเที่ยว ยังไม่เริ่มใช้ จึงยังไม่ได้คำนวณในหน้านี้</li>
+          <li>สายสีม่วงและสายสีแดง จำกัด 40 บาทต่อวันสำหรับบัตร EMV ถึง 30 พ.ย. 2569</li>
+          <li>สายสีเหลือง สายสีชมพู และสายสีแดง ใช้ราคาประมาณตามระยะทาง </li>
+          <li>ข้อมูลรถแบบเรียลไทม์: ยังไม่มีบริการสาธารณะที่เปิดให้ดึงตำแหน่งรถได้ จึงแสดงความถี่ตามช่วงเวลา (เร่งด่วน/ปกติ) เป็นค่าประมาณ ไม่ใช่เวลารถจริง</li>
+          <li>เวลาเดินเปลี่ยนสายและเวลานั่งระหว่างสถานีเป็นค่าประมาณ</li>
+          <li>แผนที่ในหน้านี้ใช้ Leaflet วางสถานีและแนวรางตามพิกัดจริง (ข้อมูล GIS ของ กทม.) แต่ไม่มีภาพแผนที่ถนน เพราะหน้าเว็บที่เผยแพร่ไม่อนุญาตให้โหลดภาพแผนที่หรือฝัง Google Maps ใช้ปุ่ม "เปิดใน Google Maps" เพื่อดูแผนที่จริง</li>
+          <li>สายสีน้ำเงินช่วงหลักสอง–ท่าพระ: ขบวนจากหลักสองวิ่งต่อไปทางอิสรภาพ–หัวลำโพง (ไม่ต้องเปลี่ยน) ถ้าจะไปทางจรัญฯ 13–บางโพ–เตาปูน ต้องเปลี่ยนขบวนที่ท่าพระ ตามที่ รฟม. ระบุ ระบบจึงนับเป็นการเปลี่ยนขบวนและคิดค่าโดยสารต่อเนื่อง</li>
+          <li>การเปลี่ยนสายที่มีเลขชานชาลา ชั้น และทางออกจากแหล่งที่ตรวจสอบได้ (ท่าพระ สยาม เตาปูน สวนจตุจักร อโศก สีลม บางซื่อ เพชรบุรี) แสดงเป็นแผงสีส้มชัดเจน จุดอื่นให้ยึดป้ายในสถานี</li>
+          <li>เลขชานชาลาและเลขทางออกที่ผู้ให้บริการไม่ได้เผยแพร่ในแหล่งที่ตรวจสอบได้ จะระบุเป็นทิศทางรถ (ไปทางสถานีปลายทาง) ให้ดูตามป้ายในสถานี</li>
+        </ul>
+      </details>
+    </section>
+
+    <section class="mapwrap" id="mapwrap" aria-label="แผนที่เส้นทางรถไฟฟ้า">
+      <div id="map3d" hidden aria-label="แผนที่ 3 มิติ"></div>
+      <div id="map" role="application" aria-label="แผนที่สายรถไฟฟ้าตามแนวรางจริง ลากเพื่อเลื่อน ใช้ล้อเมาส์หรือสองนิ้วเพื่อซูม"></div>
+      <div class="island" id="island"><button id="lyrbtn" type="button" aria-label="ชั้นแผนที่ เส้นทางรถ เรือ ราง" aria-expanded="false" aria-controls="lyr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><button id="catbtn" type="button" aria-label="ดูสายทั้งหมด" aria-expanded="false" aria-controls="cat"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg></button><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="text" inputmode="search" placeholder="ค้นหาสถานที่ ห้าง ร้าน โรงเรียน มหาลัย หรือแตะบนแผนที่" aria-label="ค้นหาสถานที่ปลายทาง" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="qlist"><button id="qx" type="button" aria-label="ล้างคำค้น" hidden>×</button><ul id="qlist" role="listbox" hidden></ul></div>
+      <div class="lyr card" id="lyr" hidden>
+        <div class="lh"><b>ชั้นแผนที่ · เส้นทางทั่วประเทศ</b><button class="x" type="button" aria-label="ปิด">×</button></div>
+        <div class="lpre"><button type="button" data-p="all">ทั้งหมด</button><button type="button" data-p="rail">ทางราง</button><button type="button" data-p="boat">ทางเรือ</button><button type="button" data-p="bus">รถเมล์</button><button type="button" data-p="none">ซ่อนหมด</button></div>
+        <div id="lyrlist" class="lyrlist"></div>
+        <label class="lk snap"><input type="checkbox" id="lyrsnap"><i style="background:#1971c2"></i><span>ปรับเส้นให้ตรงถนน/รางจริง (ซูมใกล้, ใช้เซิร์ฟเวอร์ OSRM / Overpass ฟรี)</span></label>
+        <div class="lhint" id="lyrhint"></div>
+        <div class="lfind"><input id="lyrq" type="search" placeholder="ค้นหาสายรถ เช่น 8, 510, เรือด่วน, หัวหิน" aria-label="ค้นหาสายรถ" autocomplete="off"><ul id="lyrres"></ul></div>
+        <details class="lkey"><summary>Longdo Map (ใช้คีย์จาก config.js · ใส่คีย์อื่นทับได้)</summary><div class="lkrow"><input id="lyrkey" type="text" placeholder="วาง API key จาก map.longdo.com" autocomplete="off"><button class="btn" id="lyrkeysave" type="button">ใช้</button></div><small>คีย์เริ่มต้นตั้งในไฟล์ config.js · คีย์ที่ใส่ตรงนี้เก็บในเบราว์เซอร์ของคุณเท่านั้นและใช้แทนคีย์เริ่มต้น</small></details>
+        <small class="lnote">ข้อมูล: GTFS ของ สนข. (Namtang) ฉบับ ต.ค. 2569 · แผนที่ OpenFreeMap / OpenStreetMap</small>
+      </div>
+      <div class="cat card" id="cat" hidden>
+        <div class="ch"><button type="button" id="catback" class="cb" aria-label="ย้อนกลับ" hidden>‹</button><b id="cattitle">สายทั้งหมด</b><button class="x" id="catx" type="button" aria-label="ปิด">×</button></div>
+        <input id="catq" type="search" placeholder="ค้นหาเลขสาย / ชื่อสาย / ปลายทาง" aria-label="ค้นหาสาย" autocomplete="off">
+        <div id="catbody" class="cbody"></div>
+        <button type="button" id="catmin" class="catmin">▾ ซ่อนรายการ เพื่อดูแผนที่</button>
+      </div>
+      <div class="chips" id="chips" role="group" aria-label="เลือกสายที่จะแสดง"></div>
+      <div class="zoom"><button id="zin" type="button" aria-label="ซูมเข้า">+</button><button id="zout" type="button" aria-label="ซูมออก">−</button><button id="names" type="button" aria-pressed="true" aria-label="แสดงชื่อสถานี" style="font-size:13px">ชื่อ</button><button id="fit" type="button" aria-label="ดูทั้งหมด" style="font-size:13px">⤢</button></div>
+      <select class="stylesel" id="mapstyle" aria-label="รูปแบบแผนที่" hidden></select>
+      <div class="attr" id="attr" hidden></div>
+      <div class="stcard card" id="stcard" hidden></div>
+      <div class="sim card" id="sim" hidden aria-live="polite">
+        <div class="simtop"><b class="clock" id="simclock">--:--</b><span id="simsub"></span><button class="x" id="simx" type="button" aria-label="ปิดการจำลอง">×</button></div>
+        <div class="simmsg" id="simmsg"></div>
+        <div class="simbar" id="simbar"><div id="simfill"></div><span id="simticks"></span></div>
+        <div class="simctl"><button id="simprev" type="button" aria-label="ย้อนกลับ">⏮</button><button id="simplay" type="button" aria-label="เล่น">▶</button><button id="simnext" type="button" aria-label="ขั้นตอนถัดไป">⏭</button><button id="simspd" type="button" aria-label="ความเร็ว">1×</button></div>
+      </div>
+      <div class="maplabel">แตะที่สถานีเพื่อดูรายละเอียด · ลากเพื่อเลื่อน · ซูมอิสระ</div>
+    </section>
+  </div>
+
+  <nav class="tabbar" aria-label="มุมมอง">
+    <button id="tabPlan" type="button" aria-selected="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.5 6H15a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h6.5"/></svg>เส้นทาง</button>
+    <button id="tabMap" type="button" aria-selected="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>แผนที่</button>
+  </nav>
+</div>
+<script>
+/*JS*/
+</script>
+
